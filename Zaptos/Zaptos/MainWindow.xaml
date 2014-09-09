@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="550" Width="1000">
     <Grid>
-        <RichTextBox Name="richTextEditor" />
+        <RichTextBox Name="richTextEditor" Margin="0,23,-33,-75" />
         <Menu Grid.Column="0" Grid.Row="0" VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem x:Name="NewMenu" Header="_New" ToolTip="Creates New File" InputGestureText="CTRL+N" ></MenuItem>
