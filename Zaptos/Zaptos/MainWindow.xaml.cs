@@ -30,7 +30,7 @@ namespace Zaptos
         {
             fileIO writer = new fileIO();
             string[] lines = { writer.ExtractFromRichTextBox(richTextEditor) };
-            writer.WriteToFile(@"\temp.txt", lines);
+            writer.WriteToFile(@"d:\temp.txt", lines);
         }
 
         void Read()
