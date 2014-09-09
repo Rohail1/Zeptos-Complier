@@ -23,7 +23,7 @@
                 <MenuItem Command="SelectAll"/>
             </MenuItem>
             <MenuItem Header="_Debug">
-                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5"></MenuItem>
+                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5" Click="Button_Click" KeyUp="Debug_KeyUp"></MenuItem>
                 
             </MenuItem>
         </Menu>
