@@ -5,15 +5,25 @@
     <Grid>
         <RichTextBox Name="richTextEditor" />
         <Menu Grid.Column="0" Grid.Row="0" VerticalAlignment="Top">
-            <MenuItem Header="_File">
-                <MenuItem x:Name="NewMenu" 
+            <MenuItem Header="File">
+                <MenuItem x:Name="NewMenu" Header="_New" ToolTip="Creates New File" InputGestureText="CTRL+N" ></MenuItem>
+                <MenuItem x:Name="SaveMenu" Header="_Save" ToolTip="Saves the current file" InputGestureText="CTRL+L"></MenuItem>
+                <Separator/>
+                <MenuItem x:Name="ExitMenu" Header="_Exit" ToolTip="Exits the program"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Command="Undo"/>
+                <MenuItem Command="Redo"/>
+                <Separator/>
+                <MenuItem Command="Cut"/>
+                <MenuItem Command="Copy"/>
+                <MenuItem Command="Paste"/>
+                <Separator/>
+                <MenuItem Command="SelectAll"/>
             </MenuItem>
         </Menu>
     </Grid>
-        <Button Height="60" Width="60" Margin="387,535,70,63" Click="Button_Click" >
-            write
-        </Button>
-        <Button Content="Read" HorizontalAlignment="Left" Margin="193,556,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"></Button>
+       
 
 
         
