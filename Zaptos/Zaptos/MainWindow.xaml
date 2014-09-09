@@ -23,8 +23,8 @@
                 <MenuItem Command="SelectAll"/>
             </MenuItem>
             <MenuItem Header="_Debug">
-                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5" Click="Button_Click" KeyUp="Debug_KeyUp"></MenuItem>
-                
+                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5" ></MenuItem>
+                <MenuItem x:Name="GenTokSet" Header="GenTokSet" ToolTip="GenTokSet" InputGestureText="F6"></MenuItem>
             </MenuItem>
         </Menu>
     </Grid>
