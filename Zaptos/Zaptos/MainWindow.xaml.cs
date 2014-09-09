@@ -40,5 +40,13 @@ namespace Zaptos
             string[] lines = reader.ReadFromFile(@"d:\temp.txt");
             reader.WriteToFile(@"d:\temp2.txt", lines);
         }
+
+        private void Debug_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                Button_Click();
+            }
+        }
     }
 }
