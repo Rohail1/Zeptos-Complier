@@ -7,6 +7,7 @@
         <Menu Grid.Column="0" Grid.Row="0" VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem x:Name="NewMenu" Header="_New" ToolTip="Creates New File" InputGestureText="CTRL+N" ></MenuItem>
+                <MenuItem x:Name="Open" Header="_Open" ToolTip="Open the new file" InputGestureText="CTRL+O"></MenuItem>
                 <MenuItem x:Name="SaveMenu" Header="_Save" ToolTip="Saves the current file" InputGestureText="CTRL+L"></MenuItem>
                 <Separator/>
                 <MenuItem x:Name="ExitMenu" Header="_Exit" ToolTip="Exits the program"></MenuItem>
