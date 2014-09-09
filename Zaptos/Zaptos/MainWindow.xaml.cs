@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Zaptos;
 
 namespace Zaptos
 {
@@ -23,6 +24,21 @@ namespace Zaptos
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            fileIO writer = new fileIO();
+            string[] lines = {writer.ExtractFromRichTextBox(richTextEditor)};
+            writer.WriteToFile(@"d:\temp.txt", lines);
+
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            fileIO reader = new fileIO();
+            string[] lines = reader.ReadFromFile(@"d:\temp.txt");
+            reader.WriteToFile(@"d:\temp2.txt", lines);
         }
     }
 }
