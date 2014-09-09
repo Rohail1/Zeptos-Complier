@@ -22,7 +22,7 @@
                 <Separator/>
                 <MenuItem Command="SelectAll"/>
             </MenuItem>
-            <MenuItem Header="_Debug" ToolTip="F5">
+            <MenuItem Header="_Debug" ToolTip="F5" Click="Button_Click" >
                 
             </MenuItem>
         </Menu>
