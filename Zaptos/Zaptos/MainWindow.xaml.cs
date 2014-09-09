@@ -45,7 +45,7 @@ namespace Zaptos
         {
             if (e.Key == Key.F5)
             {
-                Button_Click();
+           //     Button_Click();
             }
         }
     }
