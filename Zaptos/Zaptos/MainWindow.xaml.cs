@@ -26,27 +26,32 @@ namespace Zaptos
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        void Debug_Event()
         {
             fileIO writer = new fileIO();
-            string[] lines = {writer.ExtractFromRichTextBox(richTextEditor)};
-            writer.WriteToFile(@"d:\temp.txt", lines);
-
+            string[] lines = { writer.ExtractFromRichTextBox(richTextEditor) };
+            writer.WriteToFile(@"\temp.txt", lines);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        void Read()
         {
             fileIO reader = new fileIO();
             string[] lines = reader.ReadFromFile(@"d:\temp.txt");
             reader.WriteToFile(@"d:\temp2.txt", lines);
-        }
 
+        }
+        
         private void Debug_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
             {
-           //     Button_Click();
+                Debug_Event();
             }
+        }
+
+        private void Debug_Click(object sender, RoutedEventArgs e)
+        {
+            Debug_Event();
         }
     }
 }
