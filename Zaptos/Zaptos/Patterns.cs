@@ -29,7 +29,7 @@ namespace Zaptos
                         flag = keyword_checker(word);
                         if(flag)
                         {
-                            tokenset.Add("(Keyword," + word + "," + line_number + ")");
+                            tokenset.Add("("+word+","+ word + "," + line_number + ")");
                             continue;
                         }
                         
@@ -97,6 +97,7 @@ namespace Zaptos
             bool dot_checker = false;
             bool double_quote_checker = false;
             bool single_qoute_checker = false;
+            bool comment_checker = false;
             for (int i = 0; i < line.Length; i++)
             {
               
@@ -405,11 +406,36 @@ namespace Zaptos
                             word_list.Add("/=");
                             i++;
                         }
-                        else
+                            else
                         {
                             word_list.Add("/=");
                             i++;
                         }
+                    }
+                    else if (line[i+1] == '/')
+                    {
+                        if (!(temperary== string.Empty))
+                        {
+                            word_list.Add(temperary);  
+                            temperary= "";
+                        }
+                        
+                        while (line[i] != '\n')
+                        {
+                            temp = line[i];
+                            temperary = temperary + temp;
+
+                            if (i < line.Length - 1)
+                            {
+                                i++;
+                            }
+                            else
+                            {
+                                temperary = "";
+                                break;
+                            }
+                        } 
+                        
                     }
                     else
                     {
@@ -651,6 +677,10 @@ namespace Zaptos
                     temperary = temperary + line[i];
                     double_quote_checker = false;
                     
+                }
+                else if (temp == '/')
+                {
+                   
                 }
                 else if (temp == '\'')
                 {
