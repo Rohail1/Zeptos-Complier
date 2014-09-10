@@ -41,7 +41,7 @@ namespace Zaptos
 
         }
         
-        private void Debug_KeyUp(object sender, KeyEventArgs e)
+        private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
             {
@@ -53,5 +53,6 @@ namespace Zaptos
         {
             Debug_Event();
         }
+
     }
 }
