@@ -33,11 +33,11 @@ namespace Zaptos
             writer.WriteToFile(@"d:\temp.txt", lines);
         }
 
-        void Read()
+        string[] Read()
         {
             fileIO reader = new fileIO();
             string[] lines = reader.ReadFromFile(@"d:\temp.txt");
-            reader.WriteToFile(@"d:\temp2.txt", lines);
+            return lines;
 
         }
         
@@ -52,6 +52,14 @@ namespace Zaptos
         private void Debug_Click(object sender, RoutedEventArgs e)
         {
             Debug_Event();
+        }
+
+        private void GenTokSet_Click(object sender, RoutedEventArgs e)
+        {
+                   string[] lines= Read();
+                   List<string> abc = new List<string>();
+                   Patterns ddf = new Patterns();
+                   abc = ddf.Word_Breaker(lines[0]);
         }
 
     }

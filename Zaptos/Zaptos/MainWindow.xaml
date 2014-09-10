@@ -22,8 +22,8 @@
                 <MenuItem Command="SelectAll"/>
             </MenuItem>
             <MenuItem Header="_Debug">
-                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5" Click="Debug_Click" ></MenuItem>
-                <MenuItem x:Name="GenTokSet" Header="TokenSet" ToolTip="Generate Token Set" InputGestureText="F6"></MenuItem>
+                <MenuItem x:Name="Debug" Header="Debug" ToolTip="Debugs" InputGestureText="F5" Click="Debug_Click"></MenuItem>
+                <MenuItem x:Name="GenTokSet" Header="TokenSet" ToolTip="Generate Token Set" InputGestureText="F6" Click="GenTokSet_Click"></MenuItem>
             </MenuItem>
         </Menu>
         <RichTextBox Name="richTextEditor" Margin="0,23,0,0" />
