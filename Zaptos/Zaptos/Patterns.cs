@@ -22,57 +22,68 @@ namespace Zaptos
                 for (int i = 0; i < WordInLines.Count; i++)
                 {
                     bool flag = false;
+                    bool condition_flag = false;
                     string word = WordInLines.ElementAt(i);
-                    if (!flag)
+                    if (!condition_flag)
                     {
                         flag = keyword_checker(word);
                         if(flag)
                         {
                             tokenset.Add("(Keyword," + word + "," + line_number + ")");
+                            continue;
                         }
+                        
                     }
-                    else if (!flag)
-                    {
-                        flag = Constant_Pattern(word);
-                        if(flag)
-                        {
-                            string conts_type = const_checker(word);
-                            tokenset.Add("("+conts_type+"," + word + "," + line_number + ")");
-                        }
-                    }
-                    else if (!flag)
+                    if (!condition_flag)
                     {
                         flag = identifier_pattern(word);
-                        if(flag)
+                        if (flag)
                         {
                             tokenset.Add("(ID," + word + "," + line_number + ")");
+                            continue;
                         }
+                        
+                        
                     }
-                    else if (!flag)
+                    if (!condition_flag)
+                    {
+                        flag = Constant_Pattern(word);
+                        if (flag)
+                        {
+                            string conts_type = const_checker(word);
+                            tokenset.Add("(" + conts_type + "," + word + "," + line_number + ")");
+                            continue;
+                        }
+                        
+                    }
+                    if (!condition_flag)
                     {
                         flag = Puntuator_Pattern(word);
                         if(flag)
                         {
                             string punc_type = Punch_check(word);
                             tokenset.Add("("+punc_type+"," + word + "," + line_number + ")");
+                            continue;
                         }
                         
                     }
-                    else if (!flag)
+                    if (!condition_flag)
                     {
                         flag = Operator_Pattern(word);
                         if (flag)
                         {
                             string Operator_Type = Operator_check(word);
                             tokenset.Add("(" + Operator_Type + "," + word + "," + line_number + ")");
+                            continue;
                         }
-
+                        
                     }
-                    else
+                    if(true)
                     {
-                        tokenset.Add("(Error,Invalid," + line_number + ")");
+                        tokenset.Add("(Error,"+word+"," + line_number + ")");
                     }
-
+                    
+                    
                 }
             }
 
@@ -520,7 +531,7 @@ namespace Zaptos
                 }
                 else if (temp == '>')
                 {
-                    if (line[i + 1] == '>')
+                    if (line[i + 1] == '=')
                     {
                         if (!(temperary == string.Empty))
                         {
@@ -798,7 +809,7 @@ namespace Zaptos
         {
             bool flag = false;
             string integer_pattern = @"^[+-]?[0-9]+$";
-            string string_pattern = "^\"[A-Z]|[a-z]|[0-9]|\\d|\\s|\\|\"$" ;
+            string string_pattern = "\"((\\[^\n\r])|[^\\\\\"\n\r])*\"";
             string float_pattern =@"^[+-]?([0-9]+\.?[0-9]+)$";
             if (Regex.IsMatch(word, integer_pattern) || Regex.IsMatch(word,float_pattern) || Regex.IsMatch(word, string_pattern))
 	        {
@@ -810,7 +821,7 @@ namespace Zaptos
         string const_checker(string word)
         {
             string integer_pattern = @"^[+-]?[0-9]+$";
-            string string_pattern = "^\"[A-Z]|[a-z]|[0-9]|\\d|\\s|\\|\"$";
+            string string_pattern = "\"((\\[^\n\r])|[^\\\\\"\n\r])*\"";
             string float_pattern = @"^[+-]?([0-9]+\.?[0-9]+)$";
             string value="";
             if (Regex.IsMatch(word, integer_pattern))
@@ -823,6 +834,7 @@ namespace Zaptos
                 value = "Flt_Const";
                 return value;
             }
+
             else if (Regex.IsMatch(word, string_pattern))
             {
                 value = "str_Const";

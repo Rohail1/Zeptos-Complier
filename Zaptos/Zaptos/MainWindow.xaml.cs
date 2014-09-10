@@ -30,13 +30,13 @@ namespace Zaptos
         {
             fileIO writer = new fileIO();
             string[] lines = { writer.ExtractFromRichTextBox(richTextEditor) };
-            writer.WriteToFile(@"d:\temp.txt", lines);
+            writer.WriteToFile(@"d:\Source.txt", lines);
         }
 
         string[] Read()
         {
             fileIO reader = new fileIO();
-            string[] lines = reader.ReadFromFile(@"d:\temp.txt");
+            string[] lines = reader.ReadFromFile(@"d:\Source.txt");
             return lines;
 
         }
@@ -57,9 +57,12 @@ namespace Zaptos
         private void GenTokSet_Click(object sender, RoutedEventArgs e)
         {
                    string[] lines= Read();
-                   List<string> abc = new List<string>();
-                   Patterns ddf = new Patterns();
-                   abc = ddf.Word_Breaker(lines[0]);
+                   List<string> tokenset = new List<string>();
+                   Patterns Pattern_object = new Patterns();
+                   tokenset = Pattern_object.Pattern_Matching(lines);
+                   fileIO writer = new fileIO();
+                   writer.WriteToFile(@"d:\tokenset.txt", tokenset.ToArray());
+                   
         }
 
     }
