@@ -97,7 +97,7 @@ namespace Zaptos
             bool dot_checker = false;
             bool double_quote_checker = false;
             bool single_qoute_checker = false;
-            bool comment_checker = false;
+            int index_checker;
             for (int i = 0; i < line.Length; i++)
             {
               
@@ -243,404 +243,545 @@ namespace Zaptos
                 }
                 else if (temp == '=')
                 {
-                    if (line[i+1] == '=')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("==");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("==");
-                            i++;
-                        }     
+                        word_list.Add("=");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '=')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("" + temp);
-                        }
-                        else
-                        {
-                            word_list.Add("" + temp);
-                        }
-                    }
-                   
-                }
-                else if (temp == '+')
-                {
-                    if (line[i + 1] == '+')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("++");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("++");
-                            i++;
-                        }
-                    }
-                    else if (line[i+1] == '=')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("+=");
-                        }
-                        else
-                        {
-                            word_list.Add("+=");
-                        }
-                    }
-                    else 
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("+");
-                        }
-                        else
-                        {
-                            word_list.Add("+");
-                        }
-                    }
-
-                }
-                else if (temp == '-')
-                {
-                    if (line[i + 1] == '-')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("--");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("--");
-                            i++;
-                        }
-                    }
-                    else if (line[i + 1] == '=')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("-=");
-                        }
-                        else
-                        {
-                            word_list.Add("-=");
-                        } 
-                    }
-                    else
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("-");
-                        }
-                        else
-                        {
-                            word_list.Add("-");
-                        }
-                    }
-
-                }
-                else if (temp == '*')
-                {
-                    if (line[i + 1] == '=')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("*=");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("*=");
-                            i++;
-                        }
-                    }
-                    else
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("*");
-                        }
-                        else
-                        {
-                            word_list.Add("*");
-                        }
-                    }
-
-                }
-                else if (temp == '/')
-                {
-                    if (line[i + 1] == '=')
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("/=");
-                            i++;
-                        }
-                            else
-                        {
-                            word_list.Add("/=");
-                            i++;
-                        }
-                    }
-                    else if (line[i+1] == '/')
-                    {
-                        if (!(temperary== string.Empty))
-                        {
-                            word_list.Add(temperary);  
-                            temperary= "";
-                        }
-                        
-                        while (line[i] != '\n')
-                        {
-                            temp = line[i];
-                            temperary = temperary + temp;
-
-                            if (i < line.Length - 1)
+                            if (!(temperary == string.Empty))
                             {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("==");
                                 i++;
                             }
                             else
                             {
-                                temperary = "";
-                                break;
+                                word_list.Add("==");
+                                i++;
                             }
-                        } 
-                        
-                    }
-                    else
-                    {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("/");
-                        }
-                        else
-                        {
-                            word_list.Add("/");
-                        }
-                    }
-
-                }
-                else if (temp == '.')
-                {
-                    if (char.IsDigit(line[i+1]))
-                    {
-                        if (!dot_checker)
-                        {
-                            temperary = temperary + temp;
-                            dot_checker = true;
                         }
                         else
                         {
                             if (!(temperary == string.Empty))
                             {
-                            word_list.Add(temperary);
-                            temperary = ""+temp;
-                            dot_checker = false;
-                            }    
-                        
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("" + temp);
+                            }
                             else
                             {
-                               temperary = ""+temp;
-                               dot_checker = false;
-                            }                 
+                                word_list.Add("" + temp);
+                            }
                         }
+                   
+                    }
+                    
+                }
+                else if (temp == '+')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add("+");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '+')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("" + temp);
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("++");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("++");
+                                i++;
+                            }
                         }
-
+                        else if (line[i + 1] == '=')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("+=");
+                            }
+                            else
+                            {
+                                word_list.Add("+=");
+                            }
+                        }
                         else
                         {
-                            word_list.Add("" + temp);
-                        }                 
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("+");
+                            }
+                            else
+                            {
+                                word_list.Add("+");
+                            }
+                        }
                     }
+                    
+
+                }
+                else if (temp == '-')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add("-");
+                        break;
+                    }
+                    else
+                    {
+                        if (line[i + 1] == '-')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("--");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("--");
+                                i++;
+                            }
+                        }
+                        else if (line[i + 1] == '=')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("-=");
+                            }
+                            else
+                            {
+                                word_list.Add("-=");
+                            }
+                        }
+                        else
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("-");
+                            }
+                            else
+                            {
+                                word_list.Add("-");
+                            }
+                        }
+                    }
+                    
+
+                }
+                else if (temp == '*')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add("*");
+                        break;
+                    }
+                    else
+                    {
+                        if (line[i + 1] == '=')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("*=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("*=");
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("*");
+                            }
+                            else
+                            {
+                                word_list.Add("*");
+                            }
+                        }
+
+                    }
+                    
+                    
+                }
+                else if (temp == '/')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add("/");
+                        break;
+                    }
+                    else
+                    {
+                        if (line[i + 1] == '=')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("/=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("/=");
+                                i++;
+                            }
+                        }
+                        else if (line[i + 1] == '/')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                            }
+
+                            while (line[i] != '\n')
+                            {
+                                temp = line[i];
+                                temperary = temperary + temp;
+
+                                if (i < line.Length - 1)
+                                {
+                                    i++;
+                                }
+                                else
+                                {
+                                    temperary = "";
+                                    break;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("/");
+                            }
+                            else
+                            {
+                                word_list.Add("/");
+                            }
+                        }
+
+                    }
+                   
+                }
+                else if (temp == '.')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add(".");
+                        break;
+                    }
+                    else
+                    {
+                        if (char.IsDigit(line[i + 1]))
+                        {
+                            if (!dot_checker)
+                            {
+                                temperary = temperary + temp;
+                                dot_checker = true;
+                            }
+                            else
+                            {
+                                if (!(temperary == string.Empty))
+                                {
+                                    word_list.Add(temperary);
+                                    temperary = "" + temp;
+                                    dot_checker = false;
+                                }
+
+                                else
+                                {
+                                    temperary = "" + temp;
+                                    dot_checker = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("" + temp);
+                            }
+
+                            else
+                            {
+                                word_list.Add("" + temp);
+                            }
+                        }
+                    }
+                    
                 }
                 else if (temp == '!')
                 {
-                    if (line[i + 1] == '=')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("!=");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("!=");
-                            i++;
-                        }
+                        word_list.Add(".");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '=')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("!");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("!=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("!=");
+                                i++;
+                            }
                         }
                         else
                         {
-                            word_list.Add("!");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("!");
+                            }
+                            else
+                            {
+                                word_list.Add("!");
+                            }
                         }
                     }
-
                 }
                 else if (temp == '<')
                 {
-                    if (line[i + 1] == '=')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("<=");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("<=");
-                            i++;
-                        }
+                        word_list.Add("<");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '=')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("<");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("<=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("<=");
+                                i++;
+                            }
                         }
                         else
                         {
-                            word_list.Add("<");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("<");
+                            }
+                            else
+                            {
+                                word_list.Add("<");
+                            }
                         }
                     }
+                    
                 }
                 else if (temp == '>')
                 {
-                    if (line[i + 1] == '=')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add(">=");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add(">=");
-                            i++;
-                        }
+                        word_list.Add(">");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '=')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add(">");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add(">=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add(">=");
+                                i++;
+                            }
                         }
                         else
                         {
-                            word_list.Add(">");
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add(">");
+                            }
+                            else
+                            {
+                                word_list.Add(">");
+                            }
                         }
-                    }
 
+                    }
+                    
                 }
                 else if (temp == '%')
                 {
-                    if (line[i + 1] == '=')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                        if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("%=");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("%=");
-                            i++;
-                        }
+                        word_list.Add("%");
+                        break;
                     }
                     else
                     {
-                        if (!(temperary == string.Empty))
+                        if (line[i + 1] == '=')
                         {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("%");
-
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("%=");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("%=");
+                                i++;
+                            }
                         }
                         else
                         {
-                            word_list.Add("%");
-                        }
-                    }
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("%");
 
-                }
+                            }
+                            else
+                            {
+                                word_list.Add("%");
+                            }
+                        }
+
+
+                    }
+                                   }
                 else if (temp == '|')
                 {
-                    if (line[i+1] == '|')
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
                     {
-                       if (!(temperary == string.Empty))
-                        {
-                            word_list.Add(temperary);
-                            temperary = "";
-                            word_list.Add("||");
-                            i++;
-                        }
-                        else
-                        {
-                            word_list.Add("||");
-                            i++;
-                        }
+                        word_list.Add("|");
+                        break;
                     }
                     else
                     {
-                        temperary = temperary + temp;
+                        if (line[i + 1] == '|')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("||");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("||");
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            temperary = temperary + temp;
+                        }
                     }
+                    
+                }
+                else if (temp == '&')
+                {
+                    index_checker = i + 1;
+                    if (index_checker >= line.Length)
+                    {
+                        word_list.Add("&");
+                        break;
+                    }
+                    else
+                    {
+                        if (line[i + 1] == '&')
+                        {
+                            if (!(temperary == string.Empty))
+                            {
+                                word_list.Add(temperary);
+                                temperary = "";
+                                word_list.Add("&&");
+                                i++;
+                            }
+                            else
+                            {
+                                word_list.Add("&&");
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            temperary = temperary + temp;
+                        }
+                    }
+
                 }
                 else if (temp == '\"')
                 {
@@ -677,10 +818,6 @@ namespace Zaptos
                     temperary = temperary + line[i];
                     double_quote_checker = false;
                     
-                }
-                else if (temp == '/')
-                {
-                   
                 }
                 else if (temp == '\'')
                 {
@@ -733,7 +870,7 @@ namespace Zaptos
         }
         public static bool Puntuator_Pattern(string word)
         {
-            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'" };
+            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'","," };
             List<string> punctuators = new List<string>(punc);
             bool flag = false;
             if (punctuators.Contains(word))
@@ -748,7 +885,7 @@ namespace Zaptos
         }
         public static string Punch_check(string word)
         {
-            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'" };
+            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'","," };
             List<string> punctuators = new List<string>(punc);
             string punc_type;
             if (punctuators.Contains(word))
@@ -763,7 +900,7 @@ namespace Zaptos
         }
         public static bool keyword_checker(string word)
         {
-            string[] keyword = { "break", "do", "main", "if", "default", "return", "else", "case", "switch", "for", "const", "var", "while", "function", "null" };
+            string[] keyword = { "break", "do", "Main", "if", "default", "return", "else", "case", "switch","new", "for", "const", "var", "while", "func", "null","MainClass","Class","Struct" };
             List<string> reservedKeywods = new List<string>(keyword);
             bool flag = false;
             if (reservedKeywods.Contains(word))

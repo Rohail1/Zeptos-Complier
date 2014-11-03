@@ -60,6 +60,8 @@ namespace Zaptos
                    List<string> tokenset = new List<string>();
                    Patterns Pattern_object = new Patterns();
                    tokenset = Pattern_object.Pattern_Matching(lines);
+                   Syntax SyntaxAnalyzer = new Syntax(tokenset);
+                   tokenset = SyntaxAnalyzer.tokkensets;
                    fileIO writer = new fileIO();
                    writer.WriteToFile(@"d:\tokenset.txt", tokenset.ToArray());
                    
