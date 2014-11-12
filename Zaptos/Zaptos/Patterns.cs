@@ -870,7 +870,7 @@ namespace Zaptos
         }
         public static bool Puntuator_Pattern(string word)
         {
-            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'","," };
+            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'","," ,":"};
             List<string> punctuators = new List<string>(punc);
             bool flag = false;
             if (punctuators.Contains(word))
@@ -885,7 +885,7 @@ namespace Zaptos
         }
         public static string Punch_check(string word)
         {
-            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'","," };
+            string[] punc = { "[", "]", "{", "}", "(", ")", ".", ";", "\"", "\'",",",":" };
             List<string> punctuators = new List<string>(punc);
             string punc_type;
             if (punctuators.Contains(word))
@@ -945,9 +945,13 @@ namespace Zaptos
                 {
                     classOfOperator = "Not_Op";
                 }
-                else if (word == "+" || word == "*" || word == "-" || word == "/" || word == "%")
+                else if (word == "+" || word == "-")
                 {
                     classOfOperator = "Arith_Op";
+                }
+                else if (word == "*" || word == "/" || word == "%")
+                {
+                    classOfOperator = "M_D_M";
                 }
                 else if (word == "&&" || word == "||")
                 {
