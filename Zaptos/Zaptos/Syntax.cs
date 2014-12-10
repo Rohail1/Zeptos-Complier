@@ -148,7 +148,9 @@ namespace Zaptos
                                 i++;
                                 if (global_Space())
                                 {
-                                    i++;
+                                  //  i++;
+                                    i = 9999;
+                 
                                 }
                                 else
                                 {
@@ -235,7 +237,15 @@ namespace Zaptos
                 if (Class())
                 {
                     i++;
-                    return true;
+                    if (global_Space())
+                    {
+                        return true;     
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                   
                 }
                 else
                 {
@@ -247,7 +257,14 @@ namespace Zaptos
                 if (Struct())
                 {
                     i++;
-                    return true;
+                    if (global_Space())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
@@ -256,6 +273,10 @@ namespace Zaptos
 
             }
             else if (mylist.ClassList.ElementAt(i) == "MainClass")
+            {
+                return true;
+            }
+            else if (mylist.ClassList.ElementAt(i) == "End_Marker")
             {
                 return true;
             }
@@ -397,7 +418,15 @@ namespace Zaptos
                         i++;
                         if (Init3())
                         {
-                            return true;
+                            i++;
+                            if (mylist.ClassList.ElementAt(i) == ";")
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
                         else
                         {
@@ -538,7 +567,7 @@ namespace Zaptos
                     i++;
                     if (ID_Const())
                     {
-                        i++;
+                       // i++;
                         if (More_Elements())
                         {
 
@@ -578,7 +607,7 @@ namespace Zaptos
                 i++;
                 if (ID_Const())
                 {
-                    i++;
+                  //  i++;
                     if (More_Elements())
                     {
                         return true;
@@ -606,10 +635,12 @@ namespace Zaptos
         {
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                i++;
                 return true;
             }
             else if (Const())
             {
+                i++;
                 return true;
             }
             else
@@ -659,11 +690,15 @@ namespace Zaptos
         {
             if (mylist.ClassList.ElementAt(i) == ";")
             {
+                return true;
+            }
+            else if (mylist.ClassList.ElementAt(i) == "Assig_Op")
+            {
                 i++;
-                if (mylist.ClassList.ElementAt(i) == "Assig_Op")
+                if (mylist.ClassList.ElementAt(i) == "new")
                 {
                     i++;
-                    if (mylist.ClassList.ElementAt(i) == "new")
+                    if (mylist.ClassList.ElementAt(i) == "ID")
                     {
                         i++;
                         if (mylist.ClassList.ElementAt(i) == "(")
@@ -671,7 +706,6 @@ namespace Zaptos
                             i++;
                             if (Para_Less())
                             {
-                                i++;
                                 if (mylist.ClassList.ElementAt(i) == ")")
                                 {
                                     i++;
@@ -716,21 +750,29 @@ namespace Zaptos
         }
         bool Struct()
         {
-            if (mylist.ClassList.ElementAt(i) == "struct")
+            if (mylist.ClassList.ElementAt(i) == "Struct")
             {
                 i++;
-                if (mylist.ClassList.ElementAt(i) == "{")
+                if (mylist.ClassList.ElementAt(i) == "ID")
                 {
                     i++;
-                    if (Struct_Body())
+                    if (mylist.ClassList.ElementAt(i) == "{")
                     {
-
-                        if (mylist.ClassList.ElementAt(i) == "}")
+                        i++;
+                        if (Struct_Body())
                         {
-                            i++;
-                            if (mylist.ClassList.ElementAt(i) == ";")
+
+                            if (mylist.ClassList.ElementAt(i) == "}")
                             {
-                                return true;
+                                i++;
+                                if (mylist.ClassList.ElementAt(i) == ";")
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
                             }
                             else
                             {
@@ -823,17 +865,25 @@ namespace Zaptos
         {
             if (SST())
             {
-                i++;
-                if (MST())
+                if (mylist.ClassList.ElementAt(i) == "return")
                 {
                     return true;
                 }
                 else
                 {
-                    return false;
+                    i++;
+                    if (MST())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }        
                 }
+                
             }
-            else if (mylist.ClassList.ElementAt(i) == "}" || mylist.ClassList.ElementAt(i) == "break")
+            else if (mylist.ClassList.ElementAt(i) == "}" || mylist.ClassList.ElementAt(i) == "break" || mylist.ClassList.ElementAt(i) == "return")
             {
                 return true;
             }
@@ -1041,7 +1091,15 @@ namespace Zaptos
                         i++;
                         if (mylist.ClassList.ElementAt(i) == "Int_Const" || mylist.ClassList.ElementAt(i) == "Flt_Const")
                         {
-                            return true;
+                            i++;
+                            if (mylist.ClassList.ElementAt(i) == ";")
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
                         else
                         {
@@ -1075,7 +1133,7 @@ namespace Zaptos
         {
             if (Cond())
             {
-                i++;
+                //i++;
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == ";")
@@ -1278,7 +1336,7 @@ namespace Zaptos
                     i++;
                     if (ID_Const())
                     {
-                        i++;
+                       // i++;
                         if (mylist.ClassList.ElementAt(i) == ")")
                         {
                             i++;
@@ -1340,13 +1398,28 @@ namespace Zaptos
             if (mylist.ClassList.ElementAt(i) == "case")
             {
                 i++;
-                if (mylist.ClassList.ElementAt(i) == ":")
+                if (mylist.ClassList.ElementAt(i) == "ID")
                 {
                     i++;
-                    if (Case_Body())
+                    if (mylist.ClassList.ElementAt(i) == ":")
                     {
                         i++;
-                        return Case();
+                        if (Case_Body())
+                        {
+                            i++;
+                            if (Case())
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
@@ -1372,30 +1445,39 @@ namespace Zaptos
             if (mylist.ClassList.ElementAt(i) == "default")
             {
                 i++;
-                if (MST())
+                if (mylist.ClassList.ElementAt(i) == ":")
                 {
                     i++;
-                    if (mylist.ClassList.ElementAt(i) == "break")
-                    {
-                        i++;
-                        if (mylist.ClassList.ElementAt(i) == ";")
+                        if (MST())
                         {
-                            return true;
+                          //  i++;
+                            if (mylist.ClassList.ElementAt(i) == "break")
+                            {
+                                i++;
+                                if (mylist.ClassList.ElementAt(i) == ";")
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
                         else
                         {
                             return false;
                         }
-                    }
-                    else
-                    {
-                        return false;
-                    }
                 }
                 else
                 {
                     return false;
                 }
+                
             }
             else
             {
@@ -1406,7 +1488,7 @@ namespace Zaptos
         {
             if (MST())
             {
-                i++;
+                //i++;
                 if (mylist.ClassList.ElementAt(i) == "break")
                 {
                     i++;
@@ -1433,7 +1515,7 @@ namespace Zaptos
         {
             if (ID_Const())
             {
-                i++;
+              //  i++;
                 if (Cond2())
                 {
 
@@ -1544,13 +1626,13 @@ namespace Zaptos
         {
             if (MST())
             {
-                i++;
+             //   i++;
                 if (mylist.ClassList.ElementAt(i) == "return")
                 {
                     i++;
                     if (OR_OP())
                     {
-                        i++;
+                      //  i++;
                         if (mylist.ClassList.ElementAt(i) == ";")
                         {
                             return true;
@@ -1666,7 +1748,7 @@ namespace Zaptos
                         i++;
                         if (Para_Less())
                         {
-                            i++;
+                          //  i++;
                             if (mylist.ClassList.ElementAt(i) == ")")
                             {
                                 return true;
@@ -1696,7 +1778,7 @@ namespace Zaptos
                 i++;
                 if (Para_Less())
                 {
-                    i++;
+                   // i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
                         return true;
@@ -1816,7 +1898,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == "Assig_Op" || mylist.ClassList.ElementAt(i) == "Inc_dec")
+            else if (mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == "Assig_Op" || mylist.ClassList.ElementAt(i) == "Inc_dec" || mylist.ClassList.ElementAt(i) == "Relat_Op" || mylist.ClassList.ElementAt(i) == ";" || mylist.ClassList.ElementAt(i) == "M_D_M"  || mylist.ClassList.ElementAt(i) == "Arith_Op")
             {
                 return true;
             }
@@ -1829,7 +1911,7 @@ namespace Zaptos
         {
             if (And_OP())
             {
-                i++;
+               // i++;
                 if (OR_OP1())
                 {
                     return true;
@@ -1851,7 +1933,7 @@ namespace Zaptos
                 i++;
                 if (And_OP())
                 {
-                    i++;
+                  //  i++;
                     if (OR_OP1())
                     {
                         return true;
@@ -1866,7 +1948,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "||" || mylist.ClassList.ElementAt(i) == "ID" || Const() || mylist.ClassList.ElementAt(i) == "(")
+            else if (mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == ";")
             {
                 return true;
             }
@@ -1879,7 +1961,7 @@ namespace Zaptos
         {
             if (RE())
             {
-                i++;
+                //i++;
                 if (And_OP1())
                 {
                     return true;
@@ -1901,7 +1983,7 @@ namespace Zaptos
                 i++;
                 if (RE())
                 {
-                    i++;
+                  //  i++;
                     if (And_OP1())
                     {
                         return true;
@@ -1916,7 +1998,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "&&" || mylist.ClassList.ElementAt(i) == "ID" || Const() || mylist.ClassList.ElementAt(i) == "(")
+            else if (mylist.ClassList.ElementAt(i) == "||" || mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == ";")
             {
                 return true;
             }
@@ -1929,7 +2011,7 @@ namespace Zaptos
         {
             if (AE())
             {
-                i++;
+                //i++;
                 if (RE1())
                 {
                     return true;
@@ -1951,7 +2033,7 @@ namespace Zaptos
                 i++;
                 if (AE())
                 {
-                    i++;
+                  //  i++;
                     if (RE1())
                     {
                         return true;
@@ -1966,7 +2048,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "Relat_Op" || mylist.ClassList.ElementAt(i) == "ID" || Const() || mylist.ClassList.ElementAt(i) == "(")
+            else if (mylist.ClassList.ElementAt(i) == "&&" || mylist.ClassList.ElementAt(i) == "||" || mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == ";")
             {
                 return true;
             }
@@ -1979,7 +2061,7 @@ namespace Zaptos
         {
             if (T())
             {
-                i++;
+                //i++;
                 if (AE1())
                 {
                     return true;
@@ -2001,7 +2083,7 @@ namespace Zaptos
                 i++;
                 if (T())
                 {
-                    i++;
+               //     i++;
                     if (AE1())
                     {
                         return true;
@@ -2017,7 +2099,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "Arith_Op" || mylist.ClassList.ElementAt(i) == "ID" || Const() || mylist.ClassList.ElementAt(i) == "(")
+            else if (mylist.ClassList.ElementAt(i) == "&&" || mylist.ClassList.ElementAt(i) == "||" || mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == ";" || mylist.ClassList.ElementAt(i) == "Relat_Op")
             {
                 return true;
             }
@@ -2030,7 +2112,7 @@ namespace Zaptos
         {
             if (F())
             {
-                i++;
+             //   i++;
                 if (T1())
                 {
                     return true;
@@ -2052,7 +2134,7 @@ namespace Zaptos
                 i++;
                 if (F())
                 {
-                    i++;
+                    //i++;
                     if (T1())
                     {
                         return true;
@@ -2067,7 +2149,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "M_D_M" || mylist.ClassList.ElementAt(i) == "ID" || Const() || mylist.ClassList.ElementAt(i) == "(")
+            else if (mylist.ClassList.ElementAt(i) == "Arith_Op" || mylist.ClassList.ElementAt(i) == "&&" || mylist.ClassList.ElementAt(i) == "||" || mylist.ClassList.ElementAt(i) == ")" || mylist.ClassList.ElementAt(i) == ";" || mylist.ClassList.ElementAt(i) == "Relat_Op")
             {
                 return true;
             }
@@ -2081,12 +2163,7 @@ namespace Zaptos
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
                 i++;
-                //return true;
-                if (var_Objvar2())
-                {
-                    return true;
-                }
-                else if(Func_method_Calling2())
+                if (F1())
                 {
                     return true;
                 }
@@ -2098,7 +2175,7 @@ namespace Zaptos
             }
             else if (Const())
             {
-                
+                i++;
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "(")
@@ -2113,7 +2190,7 @@ namespace Zaptos
                     return false;
 	            }
             }
-            else if (mylist.ClassList.ElementAt(i) == "Inc_dec")
+            else if (F2())
             {
                 return true;
             }
@@ -2122,6 +2199,107 @@ namespace Zaptos
                 return false;
             }
         }
+        bool F1()
+        {
+            if (mylist.ClassList.ElementAt(i) == ".")
+            {
+                i++;
+                if (mylist.ClassList.ElementAt(i) == "ID")
+                {
+                    i++;
+                    if (F3())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            else if (var_arr())
+            {
+                return true;
+            }
+            else if (mylist.ClassList.ElementAt(i) == "(")
+            {
+                i++;
+                if (Para_Less())
+                {
+                    if (mylist.ClassList.ElementAt(i) == ")")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        bool F2()
+        {
+            if (mylist.ClassList.ElementAt(i) == "Inc_dec")
+            {
+                i++;
+                if (var_Objvar())
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        bool F3()
+        {
+            if (var_arr())
+            {
+                return true;
+            }
+            else if (mylist.ClassList.ElementAt(i) == "(")
+            {
+                i++;
+                if (Para_Less())
+                {
+                    if (mylist.ClassList.ElementAt(i) == ")")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         bool SST_INC_DEC()
         {
             if (var_Objvar())
@@ -2205,41 +2383,34 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (mylist.ClassList.ElementAt(i) == "Break")
-            {
-                i++;
-                if (mylist.ClassList.ElementAt(i) == ";")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (mylist.ClassList.ElementAt(i) == "continue")
-            {
-                i++;
-                if (mylist.ClassList.ElementAt(i) == ";")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            //else if (mylist.ClassList.ElementAt(i) == "Break")
+            //{
+            //    i++;
+            //    if (mylist.ClassList.ElementAt(i) == ";")
+            //    {
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+                
+            //}
+            //else if (mylist.ClassList.ElementAt(i) == "continue")
+            //{
+            //    i++;
+            //    if (mylist.ClassList.ElementAt(i) == ";")
+            //    {
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+            //}
             else if (mylist.ClassList.ElementAt(i) == "return")
-            {
-                i++;
-                if (mylist.ClassList.ElementAt(i) == ";")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+            {  
+                return true;
             }
             else
             {
@@ -2286,7 +2457,7 @@ namespace Zaptos
                 i++;
                 if (Para_Less())
                 {
-                    i++;
+                    //i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
                         i++;
@@ -2334,7 +2505,7 @@ namespace Zaptos
                 i++;
                 if (Para_Less())
                 {
-                    i++;
+                  //  i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
                         i++;

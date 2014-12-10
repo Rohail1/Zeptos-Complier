@@ -315,10 +315,12 @@ namespace Zaptos
                                 word_list.Add(temperary);
                                 temperary = "";
                                 word_list.Add("+=");
+                                i++;
                             }
                             else
                             {
                                 word_list.Add("+=");
+                                i++;
                             }
                         }
                         else
@@ -370,10 +372,12 @@ namespace Zaptos
                                 word_list.Add(temperary);
                                 temperary = "";
                                 word_list.Add("-=");
+                                i++;
                             }
                             else
                             {
                                 word_list.Add("-=");
+                                i++;
                             }
                         }
                         else
@@ -425,6 +429,7 @@ namespace Zaptos
                                 word_list.Add(temperary);
                                 temperary = "";
                                 word_list.Add("*");
+                                
                             }
                             else
                             {
@@ -916,7 +921,7 @@ namespace Zaptos
 
         public static bool Operator_Pattern(string word)
         {
-            string[] Operators = { "++", "--", "!", "*", "/", "+", "-", "%", "&&", "||", "=", "+=", "*=", "-=", "/=", "%=", "<", ">", "<=", ">=", "!=", "==" };
+            string[] Operators = { "++", "--", "!", "*", "/", "+", "-", "%", "&&", "||", "=", "+=", "*=", "-=", "/=", "%=", "<", ">", "<=", ">=", "!=", "==","$" };
             List<string> OperatorsList = new List<string>(Operators);
             bool flag = false;
             if (OperatorsList.Contains(word))
@@ -931,7 +936,7 @@ namespace Zaptos
         }
         public static string Operator_check(string word)
         {
-            string[] Operators = { "++", "--", "!", "*", "/", "+", "-", "%", "&&", "||", "=", "+=", "*=", "-=", "/=", "%=", "<", ">", "<=", ">=", "!=", "==" };
+            string[] Operators = { "++", "--", "!", "*", "/", "+", "-", "%", "&&", "||", "=", "+=", "*=", "-=", "/=", "%=", "<", ">", "<=", ">=", "!=", "==","$" };
             string classOfOperator = "";
             for (int i = 0; i < Operators.Length; i++)
             {
@@ -964,6 +969,10 @@ namespace Zaptos
                 else if (word == "<" || word == ">" || word == "<=" || word == ">=" || word == "!=" || word == "==")
                 {
                     classOfOperator = "Relat_Op";
+                }
+                else if (word == "$")
+                {
+                    classOfOperator = "End_Marker";
                 }
             }
             return classOfOperator;
