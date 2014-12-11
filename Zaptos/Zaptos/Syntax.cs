@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zaptos;
 
 namespace Zaptos
 {
@@ -10,6 +11,8 @@ namespace Zaptos
     {
 
         MyListDT mylist = new MyListDT();
+      
+   
         int i = 0;
         public Syntax()
         {
@@ -129,8 +132,10 @@ namespace Zaptos
         }
         public List<string> SytaxAnalyzer()
         {
-            List<string> Error_List = new List<string>();
-
+            mylist.SemanticErrorList = new List<string>();
+             mylist.SyntaxErrorLineNumber = new List<string>();
+             mylist.symbolTable = new List<SymbolTable>();
+            
             if (global_Space())
             {
                // i++;
@@ -148,43 +153,42 @@ namespace Zaptos
                                 i++;
                                 if (global_Space())
                                 {
-                                  //  i++;
-                                    i = 9999;
+                                    mylist.SyntaxErrorLineNumber.Add("No Syntax Error. Code Successfully Parsed");
                  
                                 }
                                 else
                                 {
-                                    Error_List.Add(i.ToString());
+                                    mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
                                 }
                             }
                             else
                             {
-                                Error_List.Add(i.ToString());
+                                mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
                             }
                         }
                         else
                         {
-                            Error_List.Add(i.ToString());
+                            mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
                         }
                     }
                     else
                     {
-                        Error_List.Add(i.ToString());
+                        mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
                     }
                 }
                 else
                 {
-                    Error_List.Add(i.ToString());
+                    mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
                 }
 
             }
             else
             {
-                Error_List.Add(mylist.LineNumberList.ElementAt(i).ToString());
+                mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
             }
 
 
-            return Error_List;
+            return mylist.SyntaxErrorLineNumber;
         }
         bool Main_Func()
         {
@@ -2282,7 +2286,8 @@ namespace Zaptos
                 {
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
-                        return false;
+                        i++;
+                        return true;
                     }
                     else
                     {
@@ -2299,7 +2304,6 @@ namespace Zaptos
                 return false;
             }
         }
-
         bool SST_INC_DEC()
         {
             if (var_Objvar())
@@ -2576,6 +2580,115 @@ namespace Zaptos
                 return false;
             }
         }
+        string LookUp(string name,string classname,int s)
+        {
+           SymbolTable temp;
+            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s))); 
+            return temp.type;
+        }
+        void insert(string name, string classname,string type, int s)
+        {
+            mylist.symbolTable.Add(new SymbolTable(name, type, classname, s));
+        }
+        string Compatibility(string lt, string rt,string op)
+        {
+            string type = null;
+            if (op == "+" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == "+" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "+" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "+" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "+" && lt == "str_Const" && rt == "Int_Const" )
+            {
+                return type = "str_Const";
+            }
+            else if (op == "+" && rt == "str_Const" && lt == "Int_Const")
+            {
+                return type = "str_Const";
+            }
+            else if (op == "+" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "str_Const";
+            }
+            else if (op == "-" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == "-" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "-" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "-" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "*" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == "*" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "*" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "*" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "/" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == "/" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == "/" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == "/" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+            else if (op == ">" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Int_Const";
+            }
+            else if (op == ">" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Flt_Const";
+            }
+
+
+            return type;
+        }
    
     }
 }
@@ -2586,4 +2699,8 @@ class MyListDT
     public List<string> ClassList { get; set; }
     public List<string> ValueList { get; set; }
     public List<string> LineNumberList { get; set; }
+    public List<string> SyntaxErrorLineNumber { get; set; }
+    public List<string> SemanticErrorList { get; set; }
+    public List<SymbolTable> symbolTable { get; set; }
 }
+

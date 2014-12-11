@@ -958,9 +958,13 @@ namespace Zaptos
                 {
                     classOfOperator = "M_D_M";
                 }
-                else if (word == "&&" || word == "||")
+                else if (word == "||")
                 {
-                    classOfOperator = "Cond_Op";
+                    classOfOperator = "||";
+                }
+                else if (word == "&&")
+                {
+                    classOfOperator = "&&";
                 }
                 else if (word == "=" || word == "+=" || word == "*=" || word == "-=" || word == "/=" || word == "%=")
                 {
