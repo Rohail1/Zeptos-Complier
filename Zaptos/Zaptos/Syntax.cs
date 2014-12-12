@@ -2550,55 +2550,56 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST_INC_DEC()
-        {
-            if (true)
-            {
-                i++;
-                if (mylist.ClassList.ElementAt(i) == "Inc_dec")
-                {
-                    i++;
-                    if (mylist.ClassList.ElementAt(i) == ";")
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (mylist.ClassList.ElementAt(i) == "Inc_dec")
-            {
-                i++;
-                if (true)
-                {
-                    i++;
-                    if (mylist.ClassList.ElementAt(i) == ";")
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
+        //bool SST_INC_DEC()
+        //{
+        //    if (true)
+        //    {
+        //        i++;
+        //        if (mylist.ClassList.ElementAt(i) == "Inc_dec")
+        //        {
+        //            i++;
+        //            if (mylist.ClassList.ElementAt(i) == ";")
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else if (mylist.ClassList.ElementAt(i) == "Inc_dec")
+        //    {
+        //        i++;
+        //        if (true)
+        //        {
+        //            i++;
+        //            if (mylist.ClassList.ElementAt(i) == ";")
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
         bool SST(string classname,int s)
         {
+            string classtype="";
             string n;
             if (declearation(classname,s) || While(classname,s) || For(classname,s) || If(classname,s) || Do_While(classname,s) || Switch(classname,s))
             {
@@ -2625,12 +2626,33 @@ namespace Zaptos
             }
             else if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                classtype = "";
                 n = mylist.ValueList.ElementAt(i);
                 if (LookUp(n,classname,s) ==  null)
                 {
-                    mylist.SemanticErrorList.Add("Identifer Not decleared !! Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    if (LookUp(n,n,"Class") == null)
+                    {
+                        mylist.SemanticErrorList.Add("Identifer Not decleared !! Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
+                    else
+                    {
+                        classtype = mylist.symbolTable.Find(x => x.name == n && x.className == x.name).className;
+                    }
                 }
-                if (SST2(n,classname,s))
+                else if(LookUp(n,n,"Class") == null)
+                {
+                    if (LookUp(n, classname, s) == null)
+                    {
+                        mylist.SemanticErrorList.Add("Identifer Not decleared !! Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
+                    else
+                    {
+                        classtype = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                    }
+                    
+                }
+                
+                if (SST2(n,classname,classtype,s))
                 {
                     return true;
                 }
@@ -2673,7 +2695,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST2(string name,string classname,int s)
+        bool SST2(string name,string classname,string classtype,int s)
         {
             string perList = "";
             string n;
@@ -2684,6 +2706,10 @@ namespace Zaptos
                 if (LookUp(n,classname,s) !=  null)
                 {
                     mylist.SemanticErrorList.Add("Redeclearation Error !! Line Number" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
+                else
+                {
+                    insert(n, classname,name, s);
                 }
                 i++;
                 if (Object_dec2(name,n,classname,s))
@@ -2700,8 +2726,13 @@ namespace Zaptos
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n,classtype,s) == null)
+                    {
+                        
+                    }
                     i++;
-                    if (SST3(classname,s))
+                    if (SST3(n,classname,classtype,s))
                     {
                         return true;
                     }
@@ -2761,7 +2792,7 @@ namespace Zaptos
             }
 
         }
-        bool SST3(string classname,int s)
+        bool SST3(string name,string classname,string classtype,int s)
         {
             string perlist = "";
             if (mylist.ClassList.ElementAt(i) == "(")
@@ -2775,6 +2806,10 @@ namespace Zaptos
                         i++;
                         if (mylist.ClassList.ElementAt(i) == ";")
                         {
+                            if (LookUp(name,classtype,perlist) == null)
+                            {
+                                mylist.SemanticErrorList.Add("method not found Line Number#" + mylist.LineNumberList.ElementAt(i).ToString());
+                            }
                             return true;
                         }
                         else
@@ -2794,6 +2829,10 @@ namespace Zaptos
             }
             else if (var_arr(classname,s))
             {
+                if (LookUp(name, classtype) == null)
+                {
+                    mylist.SemanticErrorList.Add("method not found Line Number#" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
                 i++;
                 if (SST4(classname,s))
                 {
@@ -2811,6 +2850,7 @@ namespace Zaptos
         }
         bool SST4(string classname,int s)
         {
+
             string t = "";
             if (mylist.ClassList.ElementAt(i) == "Assig_Op")
             {
@@ -2856,6 +2896,22 @@ namespace Zaptos
                 return temp.type;
             }
             
+        }
+        string LookUp(string name, string classname)
+        {
+            SymbolTable temp = new SymbolTable();
+            temp.type = "";
+            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname)));
+
+            if (temp == null)
+            {
+                return null;
+            }
+            else
+            {
+                return temp.type;
+            }
+
         }
         string LookUp(string name, string classname, string type)
         {
