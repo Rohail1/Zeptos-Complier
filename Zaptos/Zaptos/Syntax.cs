@@ -130,7 +130,7 @@ namespace Zaptos
             wordlist.Add(temperary);
             return wordlist;
         }
-        public List<string> SytaxAnalyzer()
+        public MyListDT SytaxAnalyzer()
         {
             mylist.SemanticErrorList = new List<string>();
              mylist.SyntaxErrorLineNumber = new List<string>();
@@ -190,7 +190,7 @@ namespace Zaptos
             }
 
 
-            return mylist.SyntaxErrorLineNumber;
+            return mylist;
         }
         bool Main_Func()
         {
@@ -1837,6 +1837,7 @@ namespace Zaptos
             }
             else if (Const(ref t))
             {
+                perList += t; 
                 i++;
                 if (Para_Less2(classname,s,ref perList))
                 {
@@ -2097,10 +2098,11 @@ namespace Zaptos
         }
         bool OR_OP(string classname,int s,ref string type)
         {
-            if (And_OP(classname,s,ref type))
+            string t1 = null;
+            if (And_OP(classname,s,ref t1))
             {
                // i++;
-                if (OR_OP1(classname, s, ref type))
+                if (OR_OP1(classname, s, ref type,t1))
                 {
                     return true;
                 }
@@ -2114,15 +2116,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool OR_OP1(string classname, int s, ref string type)
+        bool OR_OP1(string classname, int s, ref string type, string type2)
         {
+            string op =null,T1=null,rt=null;
             if (mylist.ClassList.ElementAt(i) == "||")
             {
+                op = mylist.ClassList.ElementAt(i);
                 i++;
-                if (And_OP(classname, s, ref type))
+                if (And_OP(classname, s, ref rt))
                 {
+                    T1 = Compatibility(type2, rt, op);
                   //  i++;
-                    if (OR_OP1(classname, s, ref type))
+                    if (OR_OP1(classname, s, ref type,T1))
                     {
                         return true;
                     }
@@ -2147,10 +2152,11 @@ namespace Zaptos
         }
         bool And_OP(string classname, int s, ref string type)
         {
-            if (RE(classname, s, ref type))
+            string T1 = null;
+            if (RE(classname, s, ref T1))
             {
                 //i++;
-                if (And_OP1(classname, s, ref type))
+                if (And_OP1(classname, s, ref type,T1))
                 {
                     return true;
                 }
@@ -2164,15 +2170,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool And_OP1(string classname, int s, ref string type)
+        bool And_OP1(string classname, int s, ref string type,string type2)
         {
+            string op = null, rt = null, T1 = null;
             if (mylist.ClassList.ElementAt(i) == "&&")
             {
+                op = mylist.ClassList.ElementAt(i);
                 i++;
-                if (RE(classname, s, ref type))
+                if (RE(classname, s, ref rt))
                 {
+                    T1 = Compatibility(type2, rt, op);
                   //  i++;
-                    if (And_OP1(classname, s, ref type))
+                    if (And_OP1(classname, s, ref type,T1))
                     {
                         return true;
                     }
@@ -2197,10 +2206,11 @@ namespace Zaptos
         }
         bool RE(string classname, int s, ref string type)
         {
-            if (AE(classname, s, ref type))
+            string T1 = null;
+            if (AE(classname, s, ref T1))
             {
                 //i++;
-                if (RE1(classname, s, ref type))
+                if (RE1(classname, s, ref type,T1))
                 {
                     return true;
                 }
@@ -2214,15 +2224,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool RE1(string classname, int s, ref string type)
+        bool RE1(string classname, int s, ref string type, string type2)
         {
+            string op = null, T1 = null, rt = null;
             if (mylist.ClassList.ElementAt(i) == "Relat_Op")
             {
+                op = mylist.ClassList.ElementAt(i);
                 i++;
-                if (AE(classname, s, ref type))
+                if (AE(classname, s, ref rt))
                 {
+                    T1 = Compatibility(type2, rt, op);
                   //  i++;
-                    if (RE1(classname, s, ref type))
+                    if (RE1(classname, s, ref type, T1))
                     {
                         return true;
                     }
@@ -2247,10 +2260,11 @@ namespace Zaptos
         }
         bool AE(string classname, int s, ref string type)
         {
-            if (T(classname, s, ref type))
+            string t1 = null;
+            if (T(classname, s, ref t1))
             {
                 //i++;
-                if (AE1(classname, s, ref type))
+                if (AE1(classname, s, ref type,t1))
                 {
                     return true;
                 }
@@ -2264,15 +2278,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool AE1(string classname, int s, ref string type)
+        bool AE1(string classname, int s, ref string type, string type2)
         {
+            string op = null, rt = null, T1 = null;
             if (mylist.ClassList.ElementAt(i) == "Arith_Op")
             {
+                op = mylist.ClassList.ElementAt(i);
                 i++;
-                if (T(classname, s, ref type))
+                if (T(classname, s, ref rt))
                 {
+                    T1 = Compatibility(type2, rt, op);
                //     i++;
-                    if (AE1(classname, s, ref type))
+                    if (AE1(classname, s, ref type,T1))
                     {
                         return true;
                     }
@@ -2298,10 +2315,11 @@ namespace Zaptos
         }
         bool T(string classname, int s, ref string type)
         {
-            if (F(classname, s, ref type))
+            string t1 = null;
+            if (F(classname, s, ref t1))
             {
              //   i++;
-                if (T1(classname, s, ref type))
+                if (T1(classname, s, ref type,t1))
                 {
                     return true;
                 }
@@ -2315,15 +2333,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool T1(string classname, int s, ref string type)
+        bool T1(string classname, int s, ref string type,string type2)
         {
+            string op = null, rt = null, t1 = null;
             if (mylist.ClassList.ElementAt(i) == "M_D_M")
             {
+                op = mylist.ClassList.ElementAt(i);
                 i++;
-                if (F(classname, s, ref type))
+                if (F(classname, s, ref rt))
                 {
+                    t1 = Compatibility(type2, rt, op);
                     //i++;
-                    if (T1(classname, s, ref type))
+                    if (T1(classname, s, ref type,t1))
                     {
                         return true;
                     }
@@ -2348,12 +2369,25 @@ namespace Zaptos
         }
         bool F(string classname, int s, ref string type)
         {
+            string types = "";
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
                 string n = mylist.ValueList.ElementAt(i);
-                string types = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                if (LookUp(n,n,"Class") != null)
+                {
+                    types = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;    
+                }
+                else if (LookUp(n,classname,s) != null)
+                {
+                    types = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                }
+                else
+                {
+                    mylist.SemanticErrorList.Add("ID not decleared Line Number#" + mylist.LineNumberList.ElementAt(i));
+                }
+                
                 i++;
-                if (F1(classname,types, s, ref type))
+                if (F1(n,classname,types, s, ref type))
                 {
                     return true;
                 }
@@ -2389,17 +2423,18 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F1(string classname,string classtype, int s, ref string type)
+        bool F1(string idname,string classname,string classtype, int s, ref string type)
         {
             string perList = "";
+            string n = idname;
             if (mylist.ClassList.ElementAt(i) == ".")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
-
+                    n = mylist.ClassList.ElementAt(i);
                     i++;
-                    if (F3(classname,s,ref type))
+                    if (F3(n,classname,classtype,s,ref type))
                     {
                         return true;
                     }
@@ -2416,6 +2451,18 @@ namespace Zaptos
             }
             else if (var_arr(classname,s))
             {
+                if (LookUp(n, n, "Class") != null)
+                {
+                    type = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                }
+                else if (LookUp(n, classname, s) != null)
+                {
+                    type = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                }
+                else
+                {
+                    mylist.SemanticErrorList.Add("ID not decleared Line Number#" + mylist.LineNumberList.ElementAt(i));
+                }
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "(")
@@ -2425,7 +2472,11 @@ namespace Zaptos
                 {
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
-                        return false;
+                        if (LookUp(n,classtype,perList) == null)
+                        {
+                            mylist.SemanticErrorList.Add("Method not defined Line Number# " + mylist.LineNumberList.ElementAt(i).ToString());
+                        }
+                        return true;
                     }
                     else
                     {
@@ -2461,11 +2512,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F3(string classname, int s, ref string type)
+        bool F3(string name,string classname,string classtype, int s, ref string type)
         {
             string perList = "";
             if (var_arr(classname,s))
             {
+                type = mylist.symbolTable.Find(x => x.name == name && x.className == classtype).type;
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "(")
@@ -2475,6 +2527,11 @@ namespace Zaptos
                 {
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
+                        if ( LookUp(name, classtype, perList) == null)
+                        {
+                            mylist.SemanticErrorList.Add("Method not defined Line Number# " + mylist.LineNumberList.ElementAt(i).ToString());
+                        }
+
                         i++;
                         return true;
                     }
@@ -2787,23 +2844,46 @@ namespace Zaptos
         string LookUp(string name,string classname,int s)
         {
             SymbolTable temp = new SymbolTable();
-            temp.type = null;
-            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s))); 
-            return temp.type;
+            temp.type = "";
+            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s)));
+
+            if (temp == null)
+            {
+                return null;
+            }
+            else
+            {
+                return temp.type;
+            }
+            
         }
         string LookUp(string name, string classname, string type)
         {
             SymbolTable temp = new SymbolTable();
             temp.type = null;
             temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.type == type)));
-            return temp.type;
+            if (temp == null)
+            {
+                return null;
+            }
+            else
+            {
+                return temp.type;
+            }
         }
         string LookUp(string name, string classname,string type, int s)
         {
             SymbolTable temp = new SymbolTable();
             temp.type = null;
             temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s) && (x.type == type)));
-            return temp.type;
+            if (temp == null)
+            {
+                return null;
+            }
+            else
+            {
+                return temp.type;
+            }
         }
         void insert(string name, string classname,string type, int s)
         {
