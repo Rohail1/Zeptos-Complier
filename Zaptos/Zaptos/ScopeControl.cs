@@ -23,7 +23,6 @@ namespace Zaptos
         public void DestroyScope()
         {
             ScopeStack.Pop();
-            Scope--;
 
         }
     }

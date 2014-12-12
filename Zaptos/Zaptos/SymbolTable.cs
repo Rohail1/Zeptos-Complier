@@ -11,6 +11,10 @@ namespace Zaptos
         public string name, type, className;
         public int scope;
 
+       public SymbolTable()
+        {
+
+        }
         public SymbolTable(string name, string type, string classname, int s)
         {
             this.name = name;

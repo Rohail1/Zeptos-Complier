@@ -11,8 +11,7 @@ namespace Zaptos
     {
 
         MyListDT mylist = new MyListDT();
-      
-   
+        ScopeControl scope = new ScopeControl();
         int i = 0;
         public Syntax()
         {
@@ -20,6 +19,7 @@ namespace Zaptos
         }
         public void tokkensetExcater(List<string> tkset)
         {
+            
             List<string> Classlist = new List<string>();
             List<string> ValueList = new List<string>();
             List<string> lineNumber = new List<string>();
@@ -144,12 +144,14 @@ namespace Zaptos
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "{")
                     {
+                        scope.CreateScope();
                         i++;
                         if (Main_Func())
                         {
                             i++;
                             if (mylist.ClassList.ElementAt(i) == "}")
                             {
+                                scope.DestroyScope();
                                 i++;
                                 if (global_Space())
                                 {
@@ -192,20 +194,24 @@ namespace Zaptos
         }
         bool Main_Func()
         {
+            string classname;
             if (mylist.ClassList.ElementAt(i) == "func")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "Main")
                 {
+                    classname = mylist.ClassList.ElementAt(i);
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "{")
                     {
+                        scope.CreateScope();
                         i++;
-                        if (MST())
+                        if (MST(classname,scope.Scope))
                         {
 
                             if (mylist.ClassList.ElementAt(i) == "}")
                             {
+                                scope.DestroyScope();
                                 return true;
                             }
                             else
@@ -292,20 +298,33 @@ namespace Zaptos
         }
         bool Class()
         {
+            string ClassName = "";
             if (mylist.ClassList.ElementAt(i) == "Class")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    if (LookUp(mylist.ValueList.ElementAt(i),mylist.ValueList.ElementAt(i),scope.Scope) == null)
+                    {
+                        insert(mylist.ValueList.ElementAt(i), mylist.ValueList.ElementAt(i),"Class", scope.Scope);
+                        ClassName = mylist.ValueList.ElementAt(i);
+                    }
+                    else
+                    {
+                        mylist.SemanticErrorList.Add("RE-Declearation Error on Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
+
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "{")
                     {
+                        scope.CreateScope();
                         i++;
-                        if (class_body())
+                        if (class_body(ClassName))
                         {
 
                             if (mylist.ClassList.ElementAt(i) == "}")
                             {
+                                scope.DestroyScope();
                                 return true;
                             }
                             else
@@ -333,14 +352,14 @@ namespace Zaptos
                 return false;
             }
         }
-        bool class_body()
+        bool class_body(string classname)
         {
+            int s = scope.Scope;
 
-
-            if (declearation())
+            if (declearation(classname,s))
             {
                 i++;
-                if (class_body())
+                if (class_body(classname))
                 {
                     return true;
                 }
@@ -349,10 +368,10 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (func_dec())
+            else if (func_dec(classname,s))
             {
                 i++;
-                if (class_body())
+                if (class_body(classname))
                 {
                     return true;
                 }
@@ -371,15 +390,25 @@ namespace Zaptos
             }
 
         }
-        bool declearation()
+        bool declearation(string classname, int s)
         {
+            string n;
             if (mylist.ClassList.ElementAt(i) == "var")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n,classname,s) == null)
+                    {
+                        insert(n, classname, "-", s);
+                    }
+                    else
+                    {
+                        mylist.SemanticErrorList.Add("Redeclearation Error on Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
                     i++;
-                    if (dec_var_arr())
+                    if (dec_var_arr(n,classname,s))
                     {
                         return true;
                     }
@@ -398,12 +427,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool dec_var_arr()
+        bool dec_var_arr(string n,string classname, int s)
         {
-            if (Init())
+            if (Init(n,classname,s))
             {
 
-                if (List())
+                if (List(classname,s))
                 {
                     return true;
                 }
@@ -420,7 +449,7 @@ namespace Zaptos
                     if (mylist.ClassList.ElementAt(i) == "]")
                     {
                         i++;
-                        if (Init3())
+                        if (Init3(classname,s))
                         {
                             i++;
                             if (mylist.ClassList.ElementAt(i) == ";")
@@ -469,12 +498,12 @@ namespace Zaptos
                 }
             }
         }
-        bool Init()
+        bool Init(string name,string classname, int s)
         {
             if (mylist.ClassList.ElementAt(i) == "Assig_Op")
             {
                 i++;
-                if (Init2())
+                if (Init2(name,classname, s))
                 {
                     i++;
                     return true;
@@ -494,16 +523,29 @@ namespace Zaptos
             }
 
         }
-        bool Init2()
+        bool Init2(string name,string classname, int s)
         {
-            if (Const())
+            string t="", n;
+            if (Const(ref t))
             {
+                mylist.symbolTable.Find(x => (x.name == name) && (x.scope == s)).type = t;
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                n = mylist.ValueList.ElementAt(i);
+                t = LookUp(n,classname,s);
+                if (t != null)
+                {
+                    mylist.symbolTable.Find(x => (x.name == name) && (x.scope == s)).type = t;
+                }
+                else
+                {
+                    mylist.SemanticErrorList.Add("Undecleared Identifier Used !! Line Number # " + mylist.LineNumberList.ElementAt(i).ToString());
+                }
+
                 i++;
-                if (Init())
+                if (Init(name,classname,s))
                 {
                     return true;
                 }
@@ -512,7 +554,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (OR_OP())
+            else if (OR_OP(classname,s,ref t))
             {
                 return true;
             }
@@ -521,8 +563,9 @@ namespace Zaptos
                 return false;
             }
         }
-        bool List()
+        bool List(string classname,int s)
         {
+            string n;
             if (mylist.ClassList.ElementAt(i) == ";")
             {
                 return true;
@@ -532,11 +575,21 @@ namespace Zaptos
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n,classname,s) == null)
+                    {
+                        insert(n, classname, "-", s);
+                    }
+                    else
+                    {
+                        mylist.SemanticErrorList.Add("Redeclearation Error on Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
+
                     i++;
-                    if (Init())
+                    if (Init(n,classname,s))
                     {
                         i++;
-                        if (List())
+                        if (List(classname,s))
                         {
                             return true;
                         }
@@ -561,7 +614,7 @@ namespace Zaptos
             }
 
         }
-        bool Init3()
+        bool Init3(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "Assig_Op")
             {
@@ -569,10 +622,10 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == "[")
                 {
                     i++;
-                    if (ID_Const())
+                    if (ID_Const(classname,s))
                     {
                        // i++;
-                        if (More_Elements())
+                        if (More_Elements(classname,s))
                         {
 
                             if (mylist.ClassList.ElementAt(i) == "]")
@@ -604,15 +657,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool More_Elements()
+        bool More_Elements(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == ",")
             {
                 i++;
-                if (ID_Const())
+                if (ID_Const(classname,s))
                 {
                   //  i++;
-                    if (More_Elements())
+                    if (More_Elements(classname,s))
                     {
                         return true;
                     }
@@ -635,14 +688,22 @@ namespace Zaptos
                 return false;
             }
         }
-        bool ID_Const()
+        bool ID_Const(string classnames,int s)
         {
+            string t = "",n;
+
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                n = mylist.ValueList.ElementAt(i);
+                t = LookUp(n, classnames, s);
+                if (t == null)
+                {
+                    mylist.SemanticErrorList.Add("Error : Undecleared Variable Used in line number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
                 i++;
                 return true;
             }
-            else if (Const())
+            else if (Const(ref t))
             {
                 i++;
                 return true;
@@ -652,10 +713,11 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Const()
+        bool Const(ref string t)
         {
             if (mylist.ClassList.ElementAt(i) == "Int_Const" || mylist.ClassList.ElementAt(i) == "str_Const" || mylist.ClassList.ElementAt(i) == "Flt_Const")
             {
+                t = mylist.ClassList.ElementAt(i);
                 return true;
             }
             else
@@ -671,7 +733,7 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
                     i++;
-                    if (Object_dec2())
+                    if (true)
                     {
                         return true;
                     }
@@ -690,10 +752,13 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Object_dec2()
+        bool Object_dec2(string name,string objname, string classname ,int s)
         {
+            string n;
+            string perlist = "";
             if (mylist.ClassList.ElementAt(i) == ";")
             {
+                insert(objname, classname, name, s);
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "Assig_Op")
@@ -704,17 +769,23 @@ namespace Zaptos
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "ID")
                     {
+                        n = mylist.ValueList.ElementAt(i);
+                        if (LookUp(n,n,"Class") == null)
+                        {
+                            mylist.SemanticErrorList.Add("Identifier not decleared !! Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                        }
                         i++;
                         if (mylist.ClassList.ElementAt(i) == "(")
                         {
                             i++;
-                            if (Para_Less())
+                            if (Para_Less(classname,s,ref perlist))
                             {
                                 if (mylist.ClassList.ElementAt(i) == ")")
                                 {
                                     i++;
                                     if (mylist.ClassList.ElementAt(i) == ";")
                                     {
+                                        insert(objname, classname, name, s);
                                         return true;
                                     }
                                     else
@@ -754,16 +825,27 @@ namespace Zaptos
         }
         bool Struct()
         {
+            string ClassName = "";
             if (mylist.ClassList.ElementAt(i) == "Struct")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    if (LookUp(mylist.ValueList.ElementAt(i),mylist.ValueList.ElementAt(i),scope.Scope) == null)
+                    {
+                        insert(mylist.ValueList.ElementAt(i), mylist.ValueList.ElementAt(i),"struct", scope.Scope);
+                        ClassName = mylist.ValueList.ElementAt(i);
+                    }
+                    else
+                    {
+                        mylist.SemanticErrorList.Add("RE-Declearation Error on Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "{")
                     {
+                        scope.CreateScope();
                         i++;
-                        if (Struct_Body())
+                        if (Struct_Body(ClassName))
                         {
 
                             if (mylist.ClassList.ElementAt(i) == "}")
@@ -803,12 +885,13 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Struct_Body()
+        bool Struct_Body(string classname)
         {
-            if (declearation())
+            int s = scope.Scope;
+            if (declearation(classname,s))
             {
                 i++;
-                if (Struct_Body())
+                if (Struct_Body(classname))
                 {
                     return true;
                 }
@@ -817,10 +900,10 @@ namespace Zaptos
                     return true;
                 }
             }
-            else if (func_dec())
+            else if (func_dec(classname,s))
             {
                 i++;
-                if (Struct_Body())
+                if (Struct_Body(classname))
                 {
                     return true;
                 }
@@ -839,15 +922,17 @@ namespace Zaptos
             }
 
         }
-        bool Body()
+        bool Body(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "{")
             {
+                scope.CreateScope();
                 i++;
-                if (MST())
+                if (MST(classname,s))
                 {
                     if (mylist.ClassList.ElementAt(i) == "}")
                     {
+                        scope.DestroyScope();
                         return true;
                     }
                     else
@@ -865,9 +950,9 @@ namespace Zaptos
                 return false;
             }
         }
-        bool MST()
+        bool MST(string classname,int s)
         {
-            if (SST())
+            if (SST(classname,s))
             {
                 if (mylist.ClassList.ElementAt(i) == "return")
                 {
@@ -876,7 +961,7 @@ namespace Zaptos
                 else
                 {
                     i++;
-                    if (MST())
+                    if (MST(classname,s))
                     {
                         return true;
                     }
@@ -898,7 +983,7 @@ namespace Zaptos
             }
 
         }
-        bool If()
+        bool If(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "if")
             {
@@ -906,16 +991,16 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == "(")
                 {
                     i++;
-                    if (Cond())
+                    if (Cond(classname,s))
                     {
 
                         if (mylist.ClassList.ElementAt(i) == ")")
                         {
                             i++;
-                            if (Body())
+                            if (Body(classname,s))
                             {
                                 i++;
-                                if (O_Else())
+                                if (O_Else(classname,s))
                                 {
                                     return true;
                                 }
@@ -949,12 +1034,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool O_Else()
+        bool O_Else(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "else")
             {
                 i++;
-                if (Body())
+                if (Body(classname,s))
                 {
                     return true;
                 }
@@ -963,7 +1048,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (MST())
+            else if (MST(classname,s))
             {
                 return true;
             }
@@ -972,7 +1057,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool While()
+        bool While(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "while")
             {
@@ -980,13 +1065,13 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == "(")
                 {
                     i++;
-                    if (Cond())
+                    if (Cond(classname,s))
                     {
 
                         if (mylist.ClassList.ElementAt(i) == ")")
                         {
                             i++;
-                            if (Body())
+                            if (Body(classname,s))
                             {
                                 return true;
                             }
@@ -1015,30 +1100,33 @@ namespace Zaptos
                 return false;
             }
         }
-        bool For()
+        bool For(string classname,int s)
         {
+
             if (mylist.ClassList.ElementAt(i) == "for")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "(")
                 {
+                    scope.CreateScope();
+                    s = scope.Scope;
                     i++;
-                    if (Assign_Dec())
+                    if (Assign_Dec(classname,s))
                     {
                         i++;
-                        if (for_Cond())
+                        if (for_Cond(classname,s))
                         {
 
                             if (mylist.ClassList.ElementAt(i) == ";")
                             {
                                 i++;
-                                if (Assign_INC_Dec())
+                                if (Assign_INC_Dec(classname,s))
                                 {
 
                                     if (mylist.ClassList.ElementAt(i) == ")")
                                     {
                                         i++;
-                                        if (Body())
+                                        if (For_Body(classname,s))
                                         {
                                             return true;
                                         }
@@ -1082,19 +1170,54 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Assign_Dec()
+        bool For_Body(string classname, int s)
         {
+            if (mylist.ClassList.ElementAt(i) == "{")
+            {
+
+                i++;
+                if (MST(classname, s))
+                {
+                    if (mylist.ClassList.ElementAt(i) == "}")
+                    {
+                        scope.DestroyScope();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        bool Assign_Dec(string classname,int s)
+        {
+            string n;
             if (mylist.ClassList.ElementAt(i) == "var")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n,classname,s) == null)
+                    {
+                        insert(n, classname, "-", s);
+                    }
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "Assig_Op")
                     {
                         i++;
                         if (mylist.ClassList.ElementAt(i) == "Int_Const" || mylist.ClassList.ElementAt(i) == "Flt_Const")
                         {
+                            mylist.symbolTable.Find(x => ((x.className == classname) && (x.name == n) && (x.scope == s))).type = mylist.ClassList.ElementAt(i);
                             i++;
                             if (mylist.ClassList.ElementAt(i) == ";")
                             {
@@ -1120,7 +1243,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (Assignment())
+            else if (Assignment(classname,s))
             {
                 return true;
             }
@@ -1133,9 +1256,9 @@ namespace Zaptos
                 return false;
             }
         }
-        bool for_Cond()
+        bool for_Cond(string classname,int s)
         {
-            if (Cond())
+            if (Cond(classname,s))
             {
                 //i++;
                 return true;
@@ -1149,12 +1272,17 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Assign_INC_Dec()
+        bool Assign_INC_Dec(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                string n = mylist.ValueList.ElementAt(i);
+                if (LookUp(n,classname,s) == null)
+                {
+                    mylist.SemanticErrorList.Add("Error : Identifier Not decleared. Line Number# " + mylist.LineNumberList.ElementAt(i).ToString());
+                }
                 i++;
-                if (Assign_INC_Dec2())
+                if (Assign_INC_Dec2(classname,s))
                 {
                     i++;
                     return true;
@@ -1169,8 +1297,13 @@ namespace Zaptos
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    string n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n, classname, s) == null)
+                    {
+                        mylist.SemanticErrorList.Add("Error : Identifier Not decleared. Line Number# " + mylist.LineNumberList.ElementAt(i).ToString());
+                    }
                     i++;
-                    if (var_arr())
+                    if (var_arr(classname,s))
                     {
                         return true;
                     }
@@ -1193,21 +1326,22 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Assign_INC_Dec2()
+        bool Assign_INC_Dec2(string classname,int s)
         {
+            string t = "";
             if (mylist.ClassList.ElementAt(i) == ".")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
                     i++;
-                    if (var_arr())
+                    if (var_arr(classname,s))
                     {
 
                         if (mylist.ClassList.ElementAt(i) == "Assig_Op")
                         {
                             i++;
-                            if (OR_OP())
+                            if (OR_OP(classname,s,ref t))
                             {
                                 return true;
                             }
@@ -1231,10 +1365,10 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (var_arr())
+            else if (var_arr(classname,s))
             {
 
-                if (Assign_INC_Dec3())
+                if (Assign_INC_Dec3(classname,s,ref t))
                 {
                     return true;
                 }
@@ -1248,12 +1382,13 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Assign_INC_Dec3()
+        bool Assign_INC_Dec3(string classname,int s,ref string type)
         {
+           
             if (mylist.ClassList.ElementAt(i) == "Assig_Op")
             {
                 i++;
-                if (OR_OP())
+                if (OR_OP(classname,s,ref type))
                 {
                     return true;
                 }
@@ -1271,12 +1406,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Do_While()
+        bool Do_While(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "do")
             {
                 i++;
-                if (Body())
+                if (Body(classname,s))
                 {
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "while")
@@ -1285,7 +1420,7 @@ namespace Zaptos
                         if (mylist.ClassList.ElementAt(i) == "(")
                         {
                             i++;
-                            if (Cond())
+                            if (Cond(classname,s))
                             {
 
                                 if (mylist.ClassList.ElementAt(i) == ")")
@@ -1330,15 +1465,16 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Switch()
+        bool Switch(string classname,int s)
         {
+
             if (mylist.ClassList.ElementAt(i) == "switch")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "(")
                 {
                     i++;
-                    if (ID_Const())
+                    if (ID_Const(classname,s))
                     {
                        // i++;
                         if (mylist.ClassList.ElementAt(i) == ")")
@@ -1346,11 +1482,13 @@ namespace Zaptos
                             i++;
                             if (mylist.ClassList.ElementAt(i) == "{")
                             {
+                                scope.CreateScope();
+                                s = scope.Scope;
                                 i++;
-                                if (Case())
+                                if (Case(classname,s))
                                 {
 
-                                    if (Default())
+                                    if (Default(classname,s))
                                     {
                                         i++;
                                         if (mylist.ClassList.ElementAt(i) == "}")
@@ -1397,21 +1535,21 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Case()
+        bool Case(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "case")
             {
                 i++;
-                if (mylist.ClassList.ElementAt(i) == "ID")
+                if (ID_Const(classname,s))
                 {
-                    i++;
+                    //i++;
                     if (mylist.ClassList.ElementAt(i) == ":")
                     {
                         i++;
-                        if (Case_Body())
+                        if (Case_Body(classname,s))
                         {
                             i++;
-                            if (Case())
+                            if (Case(classname,s))
                             {
                                 return true;
                             }
@@ -1444,7 +1582,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Default()
+        bool Default(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "default")
             {
@@ -1452,7 +1590,7 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == ":")
                 {
                     i++;
-                        if (MST())
+                        if (MST(classname,s))
                         {
                           //  i++;
                             if (mylist.ClassList.ElementAt(i) == "break")
@@ -1488,9 +1626,9 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Case_Body()
+        bool Case_Body(string classname,int s)
         {
-            if (MST())
+            if (MST(classname,s))
             {
                 //i++;
                 if (mylist.ClassList.ElementAt(i) == "break")
@@ -1515,12 +1653,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Cond()
+        bool Cond(string classname,int s)
         {
-            if (ID_Const())
+            if (ID_Const(classname,s))
             {
               //  i++;
-                if (Cond2())
+                if (Cond2(classname,s))
                 {
 
                     return true;
@@ -1535,12 +1673,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Cond2()
+        bool Cond2(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "Relat_Op")
             {
                 i++;
-                if (ID_Const())
+                if (ID_Const(classname,s))
                 {
                     return true;
                 }
@@ -1558,31 +1696,44 @@ namespace Zaptos
                 return false;
             }
         }
-        bool func_dec()
+        bool func_dec(string classname,int s)
         {
+            string n, perematerList = "";
             if (mylist.ClassList.ElementAt(i) == "func")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "(")
                     {
+                        scope.CreateScope();
+                        s = scope.Scope;
                         i++;
-                        if (Para_Less())
+                        if (Para_Less(classname,s, ref perematerList))
                         {
                            // i++;
                             if (mylist.ClassList.ElementAt(i) == ")")
                             {
+                                if (LookUp(n,classname,perematerList,s) == null)
+                                {
+                                    insert(n, classname, perematerList, s);
+                                }
+                                else
+                                {
+                                    mylist.SemanticErrorList.Add("Function with These perameters already decleared. Line Number # " + mylist.LineNumberList.ElementAt(i).ToString());
+                                }
                                 i++;
                                 if (mylist.ClassList.ElementAt(i) == "{")
                                 {
                                     i++;
-                                    if (Func_Body())
+                                    if (Func_Body(classname,s))
                                     {
                                         i++;
                                         if (mylist.ClassList.ElementAt(i) == "}")
                                         {
+                                            scope.DestroyScope();
                                             return true;
                                         }
                                         else
@@ -1626,15 +1777,16 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Func_Body()
+        bool Func_Body(string classname,int s)
         {
-            if (MST())
+            string t = "";
+            if (MST(classname,s))
             {
              //   i++;
                 if (mylist.ClassList.ElementAt(i) == "return")
                 {
                     i++;
-                    if (OR_OP())
+                    if (OR_OP(classname,s,ref t))
                     {
                       //  i++;
                         if (mylist.ClassList.ElementAt(i) == ";")
@@ -1661,12 +1813,20 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Para_Less()
+        bool Para_Less(string classname,int s, ref string perList)
         {
+            string t = "";
+            string n;
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                n = mylist.ValueList.ElementAt(i);
+                if (LookUp(n,classname,s) == null)
+                {
+                    insert(n, classname, "-", s);
+                    perList += n;
+                }
                 i++;
-                if (Para_Less2())
+                if (Para_Less2(classname,s,ref perList))
                 {
                     return true;
                 }
@@ -1675,10 +1835,10 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (Const())
+            else if (Const(ref t))
             {
                 i++;
-                if (Para_Less2())
+                if (Para_Less2(classname,s,ref perList))
                 {
                     return true;
                 }
@@ -1697,12 +1857,12 @@ namespace Zaptos
             }
 
         }
-        bool Para_Less2()
+        bool Para_Less2(string classname,int s,ref string perlist)
         {
             if (mylist.ClassList.ElementAt(i) == ",")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s,ref perlist))
                 {
                     return true;
                 }
@@ -1720,12 +1880,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Func_method_Calling()
+        bool Func_method_Calling(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
                 i++;
-                if (Func_method_Calling2())
+                if (Func_method_Calling2(classname,s))
                 {
                     return true;
                 }
@@ -1739,22 +1899,30 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Func_method_Calling2()
+        bool Func_method_Calling2(string classname,int s)
         {
+            string perlist = "";
+            string n;
             if (mylist.ClassList.ElementAt(i) == ".")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "(")
                     {
                         i++;
-                        if (Para_Less())
+                        if (Para_Less(classname,s,ref perlist))
                         {
                           //  i++;
                             if (mylist.ClassList.ElementAt(i) == ")")
                             {
+                                if (LookUp(n,classname,perlist,s) == null)
+                                {
+                                    mylist.SemanticErrorList.Add("Error : Function not decleared. Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                                }
+
                                 return true;
                             }
                             else
@@ -1780,7 +1948,7 @@ namespace Zaptos
             else if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s,ref perlist))
                 {
                    // i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
@@ -1802,15 +1970,16 @@ namespace Zaptos
                 return false;
             }
         }
-        bool Assignment()
+        bool Assignment(string classname,int s)
         {
-            if (var_Objvar())
+            string t = "";
+            if (var_Objvar(classname,s))
             {
 
                 if (mylist.ClassList.ElementAt(i) == "Assig_Op")
                 {
                     i++;
-                    if (OR_OP())
+                    if (OR_OP(classname,s,ref t))
                     {
                         return true;
                     }
@@ -1829,12 +1998,21 @@ namespace Zaptos
                 return false;
             }
         }
-        bool var_Objvar()
+        bool var_Objvar(string classname,int s)
         {
+            string n;
+            string t = "";
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                n = mylist.ValueList.ElementAt(i);
+               string classnametype = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
+                t = LookUp(n, classname, s);
+                if (t == null)
+                {
+                    mylist.SemanticErrorList.Add("Identifier not Decleared Line Number#" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
                 i++;
-                if (var_Objvar2())
+                if (var_Objvar2(n,classname,classnametype,s))
                 {
                     return true;
                 }
@@ -1848,15 +2026,21 @@ namespace Zaptos
                 return false;
             }
         }
-        bool var_Objvar2()
+        bool var_Objvar2(string name,string classname,string type,int s)
         {
+            string n;
             if (mylist.ClassList.ElementAt(i) == ".")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+                    n = mylist.ValueList.ElementAt(i);
+                    if (LookUp(n,type,s) == null)
+                    {
+                        mylist.SemanticErrorList.Add("Error Identifer not decleared Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                     i++;
-                    if (var_arr())
+                    if (var_arr(classname,s))
                     {
                         return true;
                     }
@@ -1870,7 +2054,7 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (var_arr())
+            else if (var_arr(classname,s))
             {
                 return true;
             }
@@ -1879,7 +2063,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool var_arr()
+        bool var_arr(string classname,int s)
         {
             if (mylist.ClassList.ElementAt(i) == "[")
             {
@@ -1911,12 +2095,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool OR_OP()
+        bool OR_OP(string classname,int s,ref string type)
         {
-            if (And_OP())
+            if (And_OP(classname,s,ref type))
             {
                // i++;
-                if (OR_OP1())
+                if (OR_OP1(classname, s, ref type))
                 {
                     return true;
                 }
@@ -1930,15 +2114,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool OR_OP1()
+        bool OR_OP1(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "||")
             {
                 i++;
-                if (And_OP())
+                if (And_OP(classname, s, ref type))
                 {
                   //  i++;
-                    if (OR_OP1())
+                    if (OR_OP1(classname, s, ref type))
                     {
                         return true;
                     }
@@ -1961,12 +2145,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool And_OP()
+        bool And_OP(string classname, int s, ref string type)
         {
-            if (RE())
+            if (RE(classname, s, ref type))
             {
                 //i++;
-                if (And_OP1())
+                if (And_OP1(classname, s, ref type))
                 {
                     return true;
                 }
@@ -1980,15 +2164,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool And_OP1()
+        bool And_OP1(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "&&")
             {
                 i++;
-                if (RE())
+                if (RE(classname, s, ref type))
                 {
                   //  i++;
-                    if (And_OP1())
+                    if (And_OP1(classname, s, ref type))
                     {
                         return true;
                     }
@@ -2011,12 +2195,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool RE()
+        bool RE(string classname, int s, ref string type)
         {
-            if (AE())
+            if (AE(classname, s, ref type))
             {
                 //i++;
-                if (RE1())
+                if (RE1(classname, s, ref type))
                 {
                     return true;
                 }
@@ -2030,15 +2214,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool RE1()
+        bool RE1(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "Relat_Op")
             {
                 i++;
-                if (AE())
+                if (AE(classname, s, ref type))
                 {
                   //  i++;
-                    if (RE1())
+                    if (RE1(classname, s, ref type))
                     {
                         return true;
                     }
@@ -2061,12 +2245,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool AE()
+        bool AE(string classname, int s, ref string type)
         {
-            if (T())
+            if (T(classname, s, ref type))
             {
                 //i++;
-                if (AE1())
+                if (AE1(classname, s, ref type))
                 {
                     return true;
                 }
@@ -2080,15 +2264,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool AE1()
+        bool AE1(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "Arith_Op")
             {
                 i++;
-                if (T())
+                if (T(classname, s, ref type))
                 {
                //     i++;
-                    if (AE1())
+                    if (AE1(classname, s, ref type))
                     {
                         return true;
                     }
@@ -2112,12 +2296,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool T()
+        bool T(string classname, int s, ref string type)
         {
-            if (F())
+            if (F(classname, s, ref type))
             {
              //   i++;
-                if (T1())
+                if (T1(classname, s, ref type))
                 {
                     return true;
                 }
@@ -2131,15 +2315,15 @@ namespace Zaptos
                 return false;
             }
         }
-        bool T1()
+        bool T1(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "M_D_M")
             {
                 i++;
-                if (F())
+                if (F(classname, s, ref type))
                 {
                     //i++;
-                    if (T1())
+                    if (T1(classname, s, ref type))
                     {
                         return true;
                     }
@@ -2162,12 +2346,14 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F()
+        bool F(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                string n = mylist.ValueList.ElementAt(i);
+                string types = mylist.symbolTable.Find(x => x.name == n && x.className == classname).type;
                 i++;
-                if (F1())
+                if (F1(classname,types, s, ref type))
                 {
                     return true;
                 }
@@ -2177,7 +2363,7 @@ namespace Zaptos
                 }
 
             }
-            else if (Const())
+            else if (Const(ref type))
             {
                 i++;
                 return true;
@@ -2185,7 +2371,7 @@ namespace Zaptos
             else if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (OR_OP())
+                if (OR_OP(classname, s, ref type))
                 {
                     return true;
                 }
@@ -2194,7 +2380,7 @@ namespace Zaptos
                     return false;
 	            }
             }
-            else if (F2())
+            else if (F2(classname, s, ref type))
             {
                 return true;
             }
@@ -2203,15 +2389,17 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F1()
+        bool F1(string classname,string classtype, int s, ref string type)
         {
+            string perList = "";
             if (mylist.ClassList.ElementAt(i) == ".")
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
+
                     i++;
-                    if (F3())
+                    if (F3(classname,s,ref type))
                     {
                         return true;
                     }
@@ -2226,14 +2414,14 @@ namespace Zaptos
                 }
 
             }
-            else if (var_arr())
+            else if (var_arr(classname,s))
             {
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s,ref perList))
                 {
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
@@ -2254,12 +2442,12 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F2()
+        bool F2(string classname, int s, ref string type)
         {
             if (mylist.ClassList.ElementAt(i) == "Inc_dec")
             {
                 i++;
-                if (var_Objvar())
+                if (var_Objvar(classname,s))
                 {
                     return true;
                 }
@@ -2273,16 +2461,17 @@ namespace Zaptos
                 return false;
             }
         }
-        bool F3()
+        bool F3(string classname, int s, ref string type)
         {
-            if (var_arr())
+            string perList = "";
+            if (var_arr(classname,s))
             {
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s, ref perList))
                 {
                     if (mylist.ClassList.ElementAt(i) == ")")
                     {
@@ -2306,7 +2495,7 @@ namespace Zaptos
         }
         bool SST_INC_DEC()
         {
-            if (var_Objvar())
+            if (true)
             {
                 i++;
                 if (mylist.ClassList.ElementAt(i) == "Inc_dec")
@@ -2329,7 +2518,7 @@ namespace Zaptos
             else if (mylist.ClassList.ElementAt(i) == "Inc_dec")
             {
                 i++;
-                if (var_Objvar())
+                if (true)
                 {
                     i++;
                     if (mylist.ClassList.ElementAt(i) == ";")
@@ -2351,16 +2540,17 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST()
+        bool SST(string classname,int s)
         {
-            if (declearation() || While() || For() || If() || Do_While() || Switch())
+            string n;
+            if (declearation(classname,s) || While(classname,s) || For(classname,s) || If(classname,s) || Do_While(classname,s) || Switch(classname,s))
             {
                 return true;
             }
             else if (mylist.ClassList.ElementAt(i) == "Inc_dec")
             {
                 i++;
-                if (var_Objvar())
+                if (var_Objvar(classname,s))
                 {
                     if (mylist.ClassList.ElementAt(i) == ";")
                     {
@@ -2378,7 +2568,12 @@ namespace Zaptos
             }
             else if (mylist.ClassList.ElementAt(i) == "ID")
             {
-                if (SST2())
+                n = mylist.ValueList.ElementAt(i);
+                if (LookUp(n,classname,s) ==  null)
+                {
+                    mylist.SemanticErrorList.Add("Identifer Not decleared !! Line Number #" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
+                if (SST2(n,classname,s))
                 {
                     return true;
                 }
@@ -2421,13 +2616,20 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST2()
+        bool SST2(string name,string classname,int s)
         {
+            string perList = "";
+            string n;
             i++;
             if (mylist.ClassList.ElementAt(i) == "ID")
             {
+                n = mylist.ValueList.ElementAt(i);
+                if (LookUp(n,classname,s) !=  null)
+                {
+                    mylist.SemanticErrorList.Add("Redeclearation Error !! Line Number" + mylist.LineNumberList.ElementAt(i).ToString());
+                }
                 i++;
-                if (Object_dec2())
+                if (Object_dec2(name,n,classname,s))
                 {
                     return true;
                 }
@@ -2442,7 +2644,7 @@ namespace Zaptos
                 if (mylist.ClassList.ElementAt(i) == "ID")
                 {
                     i++;
-                    if (SST3())
+                    if (SST3(classname,s))
                     {
                         return true;
                     }
@@ -2459,7 +2661,7 @@ namespace Zaptos
             else if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s,ref perList))
                 {
                     //i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
@@ -2484,10 +2686,10 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (var_arr())
+            else if (var_arr(classname,s))
             {
                // i++;
-                if (SST4())
+                if (SST4(classname,s))
                 {
                     return true;
                 }
@@ -2502,12 +2704,13 @@ namespace Zaptos
             }
 
         }
-        bool SST3()
+        bool SST3(string classname,int s)
         {
+            string perlist = "";
             if (mylist.ClassList.ElementAt(i) == "(")
             {
                 i++;
-                if (Para_Less())
+                if (Para_Less(classname,s,ref perlist))
                 {
                   //  i++;
                     if (mylist.ClassList.ElementAt(i) == ")")
@@ -2532,10 +2735,10 @@ namespace Zaptos
                     return false;
                 }
             }
-            else if (var_arr())
+            else if (var_arr(classname,s))
             {
                 i++;
-                if (SST4())
+                if (SST4(classname,s))
                 {
                     return true;
                 }
@@ -2549,12 +2752,13 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST4()
+        bool SST4(string classname,int s)
         {
+            string t = "";
             if (mylist.ClassList.ElementAt(i) == "Assig_Op")
             {
                 i++;
-                if (OR_OP())
+                if (OR_OP(classname,s,ref t))
                 {
                     return true;
                 }
@@ -2582,8 +2786,23 @@ namespace Zaptos
         }
         string LookUp(string name,string classname,int s)
         {
-           SymbolTable temp;
+            SymbolTable temp = new SymbolTable();
+            temp.type = null;
             temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s))); 
+            return temp.type;
+        }
+        string LookUp(string name, string classname, string type)
+        {
+            SymbolTable temp = new SymbolTable();
+            temp.type = null;
+            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.type == type)));
+            return temp.type;
+        }
+        string LookUp(string name, string classname,string type, int s)
+        {
+            SymbolTable temp = new SymbolTable();
+            temp.type = null;
+            temp = mylist.symbolTable.Find(x => ((x.name == name) && (x.className == classname) && (x.scope == s) && (x.type == type)));
             return temp.type;
         }
         void insert(string name, string classname,string type, int s)
@@ -2679,11 +2898,211 @@ namespace Zaptos
             }
             else if (op == ">" && rt == "Int_Const" && lt == "Flt_Const")
             {
-                return type = "Int_Const";
+                return type = "Bool";
             }
             else if (op == ">" && rt == "Flt_Const" && lt == "Flt_Const")
             {
-                return type = "Flt_Const";
+                return type = "Bool";
+            }
+            else if (op == ">" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == ">=" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "<=" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "!=" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && lt == "Int_Const" && rt == "Int_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && lt == "Int_Const" && rt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && rt == "Int_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && rt == "Flt_Const" && lt == "Flt_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && lt == "Int_Const" && rt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && rt == "Int_Const" && lt == "str_const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && rt == "Flt_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && lt == "Flt_Const" && rt == "str_Const")
+            {
+                return type = "Bool";
+            }
+            else if (op == "==" && rt == "str_Const" && lt == "str_Const")
+            {
+                return type = "Bool";
             }
 
 
