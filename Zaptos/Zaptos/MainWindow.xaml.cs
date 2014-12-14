@@ -58,14 +58,15 @@ namespace Zaptos
         {
                    string[] lines= Read();
                    List<string> tokenset = new List<string>();
+                   fileIO writer = new fileIO();
                    Patterns Pattern_object = new Patterns();
-                   tokenset = Pattern_object.Pattern_Matching(lines);
                    Syntax SyntaxAnalyzer = new Syntax();
+                   tokenset = Pattern_object.Pattern_Matching(lines);
+                   writer.WriteToFile(@"d:\tokenset.txt", tokenset.ToArray());
                    SyntaxAnalyzer.tokkensetExcater(tokenset);
                    MyListDT mylist = SyntaxAnalyzer.SytaxAnalyzer();
-                   fileIO writer = new fileIO();
-                   writer.WriteToFile(@"d:\tokenset.txt", mylist.SyntaxErrorLineNumber.ToArray());
-                   writer.WriteToFile(@"d:\syntax.txt", mylist.SemanticErrorList.ToArray());
+                   writer.WriteToFile(@"d:\Syntax.txt", mylist.SyntaxErrorLineNumber.ToArray());
+                   writer.WriteToFile(@"d:\Semantic.txt", mylist.SemanticErrorList.ToArray());
                    
         }
 

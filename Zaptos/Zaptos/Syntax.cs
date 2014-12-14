@@ -189,6 +189,10 @@ namespace Zaptos
                 mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
             }
 
+            if (mylist.SemanticErrorList.Count == 0)
+            {
+                mylist.SemanticErrorList.Add("Code Successfully Parsed no Semantic Errors found");
+            }
 
             return mylist;
         }
@@ -241,6 +245,10 @@ namespace Zaptos
         }
         bool global_Space()
         {
+            if (i == mylist.ClassList.Count)
+            {
+                return false;
+            }
 
             if (mylist.ClassList.ElementAt(i) == "Class")
             {
@@ -737,10 +745,7 @@ namespace Zaptos
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
                 }
                 else
                 {
@@ -927,6 +932,7 @@ namespace Zaptos
             if (mylist.ClassList.ElementAt(i) == "{")
             {
                 scope.CreateScope();
+                s = scope.Scope;
                 i++;
                 if (MST(classname,s))
                 {
@@ -1537,12 +1543,13 @@ namespace Zaptos
         }
         bool Case(string classname,int s)
         {
+            string t = "";
             if (mylist.ClassList.ElementAt(i) == "case")
             {
                 i++;
-                if (ID_Const(classname,s))
+                if (Const(ref t))
                 {
-                    //i++;
+                    i++;
                     if (mylist.ClassList.ElementAt(i) == ":")
                     {
                         i++;
