@@ -2126,6 +2126,10 @@ namespace Zaptos
                 if (And_OP(classname, s, ref rt))
                 {
                     T1 = Compatibility(type2, rt, op);
+                    if (T1 == "Error")
+                    {
+                        mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                   //  i++;
                     if (OR_OP1(classname, s, ref type,T1))
                     {
@@ -2180,6 +2184,10 @@ namespace Zaptos
                 if (RE(classname, s, ref rt))
                 {
                     T1 = Compatibility(type2, rt, op);
+                    if (T1 == "Error")
+                    {
+                        mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                   //  i++;
                     if (And_OP1(classname, s, ref type,T1))
                     {
@@ -2234,6 +2242,10 @@ namespace Zaptos
                 if (AE(classname, s, ref rt))
                 {
                     T1 = Compatibility(type2, rt, op);
+                    if (T1 == "Error")
+                    {
+                        mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                   //  i++;
                     if (RE1(classname, s, ref type, T1))
                     {
@@ -2288,6 +2300,10 @@ namespace Zaptos
                 if (T(classname, s, ref rt))
                 {
                     T1 = Compatibility(type2, rt, op);
+                    if (T1 == "Error")
+                    {
+                        mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                //     i++;
                     if (AE1(classname, s, ref type,T1))
                     {
@@ -2343,6 +2359,10 @@ namespace Zaptos
                 if (F(classname, s, ref rt))
                 {
                     t1 = Compatibility(type2, rt, op);
+                    if (t1 == "Error")
+                    {
+                        mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                     //i++;
                     if (T1(classname, s, ref type,t1))
                     {
@@ -3240,9 +3260,11 @@ namespace Zaptos
             {
                 return type = "Bool";
             }
+            else
+            {
+                return type = "Error";
+            }
 
-
-            return type;
         }
    
     }
