@@ -12,6 +12,8 @@ namespace Zaptos
 
         MyListDT mylist = new MyListDT();
         ScopeControl scope = new ScopeControl();
+        IntermediateCodeGenerator ICG = new IntermediateCodeGenerator();
+        string tempVar="";
         int i = 0;
         public Syntax()
         {
@@ -189,6 +191,10 @@ namespace Zaptos
                 mylist.SyntaxErrorLineNumber.Add(mylist.LineNumberList.ElementAt(i).ToString());
             }
 
+            if (mylist.SemanticErrorList.Count == 0)
+            {
+                mylist.SemanticErrorList.Add("Code Successfully Parsed no Semantic Errors found");
+            }
 
             return mylist;
         }
@@ -241,6 +247,10 @@ namespace Zaptos
         }
         bool global_Space()
         {
+            if (i == mylist.ClassList.Count)
+            {
+                return false;
+            }
 
             if (mylist.ClassList.ElementAt(i) == "Class")
             {
@@ -737,10 +747,7 @@ namespace Zaptos
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
                 }
                 else
                 {
@@ -927,6 +934,7 @@ namespace Zaptos
             if (mylist.ClassList.ElementAt(i) == "{")
             {
                 scope.CreateScope();
+                s = scope.Scope;
                 i++;
                 if (MST(classname,s))
                 {
@@ -985,6 +993,7 @@ namespace Zaptos
         }
         bool If(string classname,int s)
         {
+            string label1;
             if (mylist.ClassList.ElementAt(i) == "if")
             {
                 i++;
@@ -997,10 +1006,14 @@ namespace Zaptos
                         if (mylist.ClassList.ElementAt(i) == ")")
                         {
                             i++;
+                            label1 = ICG.generatelabel();
+                            tempVar = ICG.generateTemperaryVariable();
+                            ICG.IntermediateCode += "if("+tempVar+"==false) jump " + label1;
+                            ICG.IntermediateCode += Environment.NewLine;
                             if (Body(classname,s))
                             {
                                 i++;
-                                if (O_Else(classname,s))
+                                if (O_Else(classname,s,label1))
                                 {
                                     return true;
                                 }
@@ -1034,13 +1047,21 @@ namespace Zaptos
                 return false;
             }
         }
-        bool O_Else(string classname,int s)
+        bool O_Else(string classname,int s,string label1)
         {
+            string label2;
             if (mylist.ClassList.ElementAt(i) == "else")
             {
                 i++;
+                label2 = ICG.generatelabel();
+                ICG.IntermediateCode += "jump " + label2;
+                ICG.IntermediateCode += Environment.NewLine;
+                ICG.IntermediateCode += label1 + ":";
+                ICG.IntermediateCode += Environment.NewLine;
                 if (Body(classname,s))
                 {
+                    ICG.IntermediateCode += label2 + ":";
+                    ICG.IntermediateCode += Environment.NewLine;
                     return true;
                 }
                 else
@@ -1048,8 +1069,11 @@ namespace Zaptos
                     return false;
                 }
             }
+
             else if (MST(classname,s))
             {
+                ICG.IntermediateCode += label1 + ":";
+                ICG.IntermediateCode += Environment.NewLine; 
                 return true;
             }
             else
@@ -1059,6 +1083,7 @@ namespace Zaptos
         }
         bool While(string classname,int s)
         {
+            string label1, label2;
             if (mylist.ClassList.ElementAt(i) == "while")
             {
                 i++;
@@ -1071,8 +1096,19 @@ namespace Zaptos
                         if (mylist.ClassList.ElementAt(i) == ")")
                         {
                             i++;
+                            label1 = ICG.generatelabel();
+                            label2 = ICG.generatelabel();
+                            tempVar = ICG.generateTemperaryVariable();
+                            ICG.IntermediateCode += label1 +":";
+                            ICG.IntermediateCode += Environment.NewLine;
+                            ICG.IntermediateCode += "if(" + tempVar + "==false) jump " + label2;
+                            ICG.IntermediateCode += Environment.NewLine;
                             if (Body(classname,s))
                             {
+                                ICG.IntermediateCode += " jump " + label1;
+                                ICG.IntermediateCode += Environment.NewLine;
+                                ICG.IntermediateCode += label2 + " :";
+                                ICG.IntermediateCode += Environment.NewLine;
                                 return true;
                             }
                             else
@@ -1102,7 +1138,7 @@ namespace Zaptos
         }
         bool For(string classname,int s)
         {
-
+            string label1, label2;
             if (mylist.ClassList.ElementAt(i) == "for")
             {
                 i++;
@@ -1126,8 +1162,20 @@ namespace Zaptos
                                     if (mylist.ClassList.ElementAt(i) == ")")
                                     {
                                         i++;
+                                        label1= ICG.generatelabel();
+                                        tempVar = ICG.generateTemperaryVariable();
+                                        ICG.IntermediateCode += label1 + ":";
+                                        ICG.IntermediateCode += Environment.NewLine;
+                                        label2 = ICG.generatelabel();
+                                        ICG.IntermediateCode += "if("+tempVar+"==false) jump  " + label2;
+                                        ICG.IntermediateCode += Environment.NewLine;
                                         if (For_Body(classname,s))
                                         {
+                                            ICG.IntermediateCode += "jump " + label1;
+                                            ICG.IntermediateCode += Environment.NewLine;
+                                            ICG.IntermediateCode += label2 + ":";
+                                            ICG.IntermediateCode += Environment.NewLine;
+
                                             return true;
                                         }
                                         else
@@ -1408,8 +1456,14 @@ namespace Zaptos
         }
         bool Do_While(string classname,int s)
         {
+            string Label1;
             if (mylist.ClassList.ElementAt(i) == "do")
             {
+                Label1 = ICG.generatelabel();
+                tempVar = ICG.generateTemperaryVariable();
+                ICG.IntermediateCode += Label1 + ":";
+                ICG.IntermediateCode += Environment.NewLine;
+
                 i++;
                 if (Body(classname,s))
                 {
@@ -1428,6 +1482,8 @@ namespace Zaptos
                                     i++;
                                     if (mylist.ClassList.ElementAt(i) == ";")
                                     {
+                                        ICG.IntermediateCode += "if(" + tempVar + "==true) jump " + Label1;
+                                        ICG.IntermediateCode += Environment.NewLine;
                                         return true;
                                     }
                                     else
@@ -1537,12 +1593,13 @@ namespace Zaptos
         }
         bool Case(string classname,int s)
         {
+            string t = "";
             if (mylist.ClassList.ElementAt(i) == "case")
             {
                 i++;
-                if (ID_Const(classname,s))
+                if (Const(ref t))
                 {
-                    //i++;
+                    i++;
                     if (mylist.ClassList.ElementAt(i) == ":")
                     {
                         i++;
