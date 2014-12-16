@@ -65,6 +65,7 @@ namespace Zaptos
                    writer.WriteToFile(@"d:\tokenset.txt", tokenset.ToArray());
                    SyntaxAnalyzer.tokkensetExcater(tokenset);
                    MyListDT mylist = SyntaxAnalyzer.SytaxAnalyzer();
+                   writer.WriteToFile(@"d:\IntermediateCode.txt",mylist.IntermediateCode.ToArray());
                    writer.WriteToFile(@"d:\Syntax.txt", mylist.SyntaxErrorLineNumber.ToArray());
                    writer.WriteToFile(@"d:\Semantic.txt", mylist.SemanticErrorList.ToArray());
                    

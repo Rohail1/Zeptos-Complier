@@ -215,6 +215,19 @@ namespace Zaptos
                         word_list.Add("" + temp);
                     }
                 }
+                else if (temp == ':')
+                {
+                    if (!(temperary == string.Empty))
+                    {
+                        word_list.Add(temperary);
+                        temperary = "";
+                        word_list.Add("" + temp);
+                    }
+                    else
+                    {
+                        word_list.Add("" + temp);
+                    }
+                }
                 else if (temp == ',')
                 {
                     if (!(temperary == string.Empty))

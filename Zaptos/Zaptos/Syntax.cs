@@ -134,10 +134,10 @@ namespace Zaptos
         }
         public MyListDT SytaxAnalyzer()
         {
-            mylist.SemanticErrorList = new List<string>();
+             mylist.SemanticErrorList = new List<string>();
              mylist.SyntaxErrorLineNumber = new List<string>();
              mylist.symbolTable = new List<SymbolTable>();
-            
+             mylist.IntermediateCode = new List<string>();
             if (global_Space())
             {
                // i++;
@@ -195,7 +195,15 @@ namespace Zaptos
             {
                 mylist.SemanticErrorList.Add("Code Successfully Parsed no Semantic Errors found");
             }
-
+            if (ICG.IntermediateCode == null)
+            {
+                
+            }
+            else
+            {
+                mylist.IntermediateCode.Add(ICG.IntermediateCode);
+            }
+            
             return mylist;
         }
         bool Main_Func()
@@ -1259,6 +1267,10 @@ namespace Zaptos
                     {
                         insert(n, classname, "-", s);
                     }
+                    else
+                    {
+                        mylist.SemanticErrorList.Add("Redelecaration Error ! Line Number #" + mylist.LineNumberList.ElementAt(i));
+                    }
                     i++;
                     if (mylist.ClassList.ElementAt(i) == "Assig_Op")
                     {
@@ -2039,6 +2051,7 @@ namespace Zaptos
                     i++;
                     if (OR_OP(classname,s,ref t))
                     {
+
                         return true;
                     }
                     else
@@ -2156,10 +2169,10 @@ namespace Zaptos
         bool OR_OP(string classname,int s,ref string type)
         {
             string t1 = null;
-            if (And_OP(classname,s,ref t1))
+            if (And_OP(classname,s,ref type))
             {
                // i++;
-                if (OR_OP1(classname, s, ref type,t1))
+                if (OR_OP1(classname, s, ref t1,type))
                 {
                     return true;
                 }
@@ -2173,7 +2186,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool OR_OP1(string classname, int s, ref string type, string type2)
+        bool OR_OP1(string classname, int s, ref string type,string type2)
         {
             string op =null,T1=null,rt=null;
             if (mylist.ClassList.ElementAt(i) == "||")
@@ -2182,7 +2195,7 @@ namespace Zaptos
                 i++;
                 if (And_OP(classname, s, ref rt))
                 {
-                    T1 = Compatibility(type2, rt, op);
+                    T1 = Compatibility(type, rt, op);
                     if (T1 == "Error")
                     {
                         mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
@@ -2214,7 +2227,7 @@ namespace Zaptos
         bool And_OP(string classname, int s, ref string type)
         {
             string T1 = null;
-            if (RE(classname, s, ref T1))
+            if (RE(classname, s, ref type))
             {
                 //i++;
                 if (And_OP1(classname, s, ref type,T1))
@@ -2240,7 +2253,7 @@ namespace Zaptos
                 i++;
                 if (RE(classname, s, ref rt))
                 {
-                    T1 = Compatibility(type2, rt, op);
+                    T1 = Compatibility(type, rt, op);
                     if (T1 == "Error")
                     {
                         mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
@@ -2272,7 +2285,7 @@ namespace Zaptos
         bool RE(string classname, int s, ref string type)
         {
             string T1 = null;
-            if (AE(classname, s, ref T1))
+            if (AE(classname, s, ref type))
             {
                 //i++;
                 if (RE1(classname, s, ref type,T1))
@@ -2289,7 +2302,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool RE1(string classname, int s, ref string type, string type2)
+        bool RE1(string classname, int s, ref string type,string type2)
         {
             string op = null, T1 = null, rt = null;
             if (mylist.ClassList.ElementAt(i) == "Relat_Op")
@@ -2298,13 +2311,13 @@ namespace Zaptos
                 i++;
                 if (AE(classname, s, ref rt))
                 {
-                    T1 = Compatibility(type2, rt, op);
+                    T1 = Compatibility(type, rt, op);
                     if (T1 == "Error")
                     {
                         mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
                     }
                   //  i++;
-                    if (RE1(classname, s, ref type, T1))
+                    if (RE1(classname, s, ref type,T1))
                     {
                         return true;
                     }
@@ -2330,10 +2343,10 @@ namespace Zaptos
         bool AE(string classname, int s, ref string type)
         {
             string t1 = null;
-            if (T(classname, s, ref t1))
+            if (T(classname, s, ref type))
             {
                 //i++;
-                if (AE1(classname, s, ref type,t1))
+                if (AE1(classname, s, ref type, t1))
                 {
                     return true;
                 }
@@ -2347,16 +2360,16 @@ namespace Zaptos
                 return false;
             }
         }
-        bool AE1(string classname, int s, ref string type, string type2)
+        bool AE1(string classname, int s, ref string type,string type2)
         {
             string op = null, rt = null, T1 = null;
             if (mylist.ClassList.ElementAt(i) == "Arith_Op")
             {
-                op = mylist.ClassList.ElementAt(i);
+                op = mylist.ValueList.ElementAt(i);
                 i++;
                 if (T(classname, s, ref rt))
                 {
-                    T1 = Compatibility(type2, rt, op);
+                    T1 = Compatibility(type, rt, op);
                     if (T1 == "Error")
                     {
                         mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
@@ -2389,7 +2402,7 @@ namespace Zaptos
         bool T(string classname, int s, ref string type)
         {
             string t1 = null;
-            if (F(classname, s, ref t1))
+            if (F(classname, s, ref type))
             {
              //   i++;
                 if (T1(classname, s, ref type,t1))
@@ -2415,7 +2428,7 @@ namespace Zaptos
                 i++;
                 if (F(classname, s, ref rt))
                 {
-                    t1 = Compatibility(type2, rt, op);
+                    t1 = Compatibility(type, rt, op);
                     if (t1 == "Error")
                     {
                         mylist.SemanticErrorList.Add("Operator or Operand Type Mismatch. Line Number #" + mylist.LineNumberList.ElementAt(i));
@@ -2854,7 +2867,7 @@ namespace Zaptos
             else if (var_arr(classname,s))
             {
                // i++;
-                if (SST4(classname,s))
+                if (SST4(name,classname,s))
                 {
                     return true;
                 }
@@ -2908,10 +2921,10 @@ namespace Zaptos
             {
                 if (LookUp(name, classtype) == null)
                 {
-                    mylist.SemanticErrorList.Add("method not found Line Number#" + mylist.LineNumberList.ElementAt(i).ToString());
+                    mylist.SemanticErrorList.Add("Error: Undecleared Variable Used. Line Number#" + mylist.LineNumberList.ElementAt(i).ToString());
                 }
                 i++;
-                if (SST4(classname,s))
+                if (SST4(name,classname,s))
                 {
                     return true;
                 }
@@ -2925,7 +2938,7 @@ namespace Zaptos
                 return false;
             }
         }
-        bool SST4(string classname,int s)
+        bool SST4(string name,string classname,int s)
         {
 
             string t = "";
@@ -2934,6 +2947,7 @@ namespace Zaptos
                 i++;
                 if (OR_OP(classname,s,ref t))
                 {
+                    mylist.symbolTable.Find(x => x.name == name && x.scope == s && x.className == classname).type = t;
                     return true;
                 }
                 else
@@ -3329,7 +3343,7 @@ namespace Zaptos
 
 class MyListDT
 {
-   
+    public List<string> IntermediateCode { get; set; }
     public List<string> ClassList { get; set; }
     public List<string> ValueList { get; set; }
     public List<string> LineNumberList { get; set; }
